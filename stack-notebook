@@ -1,7 +1,9 @@
 #!/usr/bin/env bash
 set -e
 
-## check if hash exists
+## todo add advice about times and probabilities
+
+## bashism: check if stack exists
 if ! hash stack 2>/dev/null; then
 cat <<- DELIM
 Error:  stack does not appear to be installed on your system!
@@ -24,11 +26,16 @@ fi
 project_root=$(stack path --project-root)
 echo "Running stack-notebook for ${project_root}..."
 
+#todo: get snapshot via `stack config get` when available
+snapshot=$(basename "$(dirname "$(stack path --snapshot-install-root)")")
+echo -e "Using snapshot ${snapshot}..."
+
+stack_root=$(stack path --stack-root)
 ## create notebook work directory
-notebook_dir=${project_root}/.stack-notebook
+notebook_dir=${stack_root}/.stack-notebook/${snapshot}
 mkdir -p ${notebook_dir}
 
-## check if conda exists
+##conda
 conda_dir=${notebook_dir}/conda
 conda=${notebook_dir}/conda/bin/conda
 if [ ! -d "${conda_dir}" ]; then
@@ -40,15 +47,15 @@ if [ ! -d "${conda_dir}" ]; then
 )
 fi
 
+#jupyter
 jupyter=${notebook_dir}/conda/bin/jupyter
-#install jupyter
 if [ ! -f "${jupyter}" ]; then
 (
   ${conda} install --yes jupyter=1.0.0 nbconvert=5.2.1
 )
 fi
 
-#install IHaskell
+## IHaskell
 ihaskell_dir=${notebook_dir}/IHaskell
 if [ ! -d "${ihaskell_dir}" ]; then
 (
@@ -64,15 +71,19 @@ if [ ! -f "${ihaskell}" ]; then
   cd ${notebook_dir}
   mkdir -p bin
   cd ${ihaskell_dir}
-  stack install ${ihaskell_dir} --local-bin-path=${notebook_dir}/bin --fast
+  stack install --resolver=${snapshot} --local-bin-path=${notebook_dir}/bin --fast
 
   ## install kernel spec (runs in stack)
+  ${ihaskell} --install ## do NOT specify --stack
 )
 fi
 
-## runtime!
+export IHASKELL_GHC_PKB_DB=\
+  $(stack path --snapshot-pkg-db)
+
+
+stack exec bash -- -c <<- EOF
+GHC_PACKAGE_PATH=export ${GHC_PACKAGE_PATH}:${IHASKELL_GHC_PKG_DB}
 ${jupyter} notebook
 
-## todo:
-## flow for reloading modified project code
-## haskell specific notebook extensions
+EOF
