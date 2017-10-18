@@ -1,0 +1,79 @@
+#!/usr/bin/env bash
+set -e
+
+## check if hash exists
+if ! hash stack 2>/dev/null; then
+cat <<- DELIM
+Error:  stack does not appear to be installed in your system!
+
+Please install it by following the instructions at:
+https://docs.haskellstack.org/en/stable/install_and_upgrade/
+
+Or on macOs with homebrew:
+brew install haskell-stack
+
+NOTE:
+The first time you use stack, it takes a few minutes to install ghc,
+and then _many_ minutes to build IHaskell.  Subsequent runs of
+stack-notebook are likely to be much faster... (at least for the same project)
+DELIM
+
+fi
+
+
+project_root=$(stack path --project-root) ## TODO: check if stack exists
+echo "Running stack-notebook for ${project_root}..."
+
+## create notebook work directory
+notebook_dir=${project_root}/.stack-notebook
+mkdir -p ${notebook_dir}
+
+## check if conda exists
+conda_dir=${notebook_dir}/conda
+conda=${notebook_dir}/conda/bin/conda
+if [ ! -d "${conda_dir}" ]; then
+(
+  cd ${notebook_dir}
+  echo "Installing miniconda..."
+  curl -O https://repo.continuum.io/miniconda/Miniconda3-latest-MacOSX-x86_64.sh
+  sh Miniconda3-latest-MacOSX-x86_64.sh -b -f -p ${conda_dir}
+)
+fi
+
+jupyter=${notebook_dir}/conda/bin/jupyter
+#install jupyter
+if [ ! -f "${jupyter}" ]; then
+(
+  ${conda} install --yes jupyter=1.0.0 nbconvert=5.2.1
+)
+fi
+
+#install IHaskell
+ihaskell_dir=${notebook_dir}/IHaskell
+if [ ! -d "${ihaskell_dir}" ]; then
+(
+    cd ${notebook_dir}
+    git clone https://github.com/habemus-papadum/IHaskell.git
+)
+fi
+
+ihaskell=${notebook_dir}/bin/ihaskell
+if [ ! -f "${ihaskell}" ]; then
+(
+  ## build
+  cd ${notebook_dir}
+  mkdir -p bin
+  stack install ${ihaskell_dir} --local-bin-path=${notebook_dir}/bin --fast
+
+  ## build displays
+
+  ## install kernel spec
+)
+fi
+
+## runtime!
+
+
+## todo:
+## flow for reloading modified project code
+## haskell specific notebook extensions
