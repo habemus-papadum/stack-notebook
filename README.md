@@ -2,6 +2,6 @@
 You say `stack ghci`, I say `stack-notebook`
 
 TODO:
-## test if jupyoter builds,
-## figure out if adhoc strategy will work
-## yaml ops
+## .notebook one more time
+## install ihaskell kernel
+## interpose pkggb into proper place on the GHC DB path env

@@ -4,7 +4,7 @@ set -e
 ## check if hash exists
 if ! hash stack 2>/dev/null; then
 cat <<- DELIM
-Error:  stack does not appear to be installed in your system!
+Error:  stack does not appear to be installed on your system!
 
 Please install it by following the instructions at:
 https://docs.haskellstack.org/en/stable/install_and_upgrade/
@@ -15,13 +15,13 @@ brew install haskell-stack
 NOTE:
 The first time you use stack, it takes a few minutes to install ghc,
 and then _many_ minutes to build IHaskell.  Subsequent runs of
-stack-notebook are likely to be much faster... (at least for the same project)
+stack-notebook are likely to be much faster... (hopefully)
 DELIM
-
+exit 1
 fi
 
 
-project_root=$(stack path --project-root) ## TODO: check if stack exists
+project_root=$(stack path --project-root)
 echo "Running stack-notebook for ${project_root}..."
 
 ## create notebook work directory
@@ -63,16 +63,15 @@ if [ ! -f "${ihaskell}" ]; then
   ## build
   cd ${notebook_dir}
   mkdir -p bin
+  cd ${ihaskell_dir}
   stack install ${ihaskell_dir} --local-bin-path=${notebook_dir}/bin --fast
 
-  ## build displays
-
-  ## install kernel spec
+  ## install kernel spec (runs in stack)
 )
 fi
 
 ## runtime!
-
+${jupyter} notebook
 
 ## todo:
 ## flow for reloading modified project code
