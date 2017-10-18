@@ -18,3 +18,7 @@ cabal.sandbox.config
 .stack-work/
 cabal.project.local
 .HTF/
+.ipynb_checkpoints
+Untitled.ipynb
+temp
+tmp

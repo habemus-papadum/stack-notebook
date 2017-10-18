@@ -1,0 +1,69 @@
+sudo: false
+cache:
+  directories:
+  - $HOME/.stack
+  - $HOME/zeromq4-x
+
+language: cpp
+
+# TODO: osx takes too long to build initial cache
+os:
+  - linux
+env:
+  - RESOLVER="--resolver=lts-9.9"
+  - RESOLVER="--resolver=lts-9.10"
+#  Travis is out of mem'ing on nightly build -- arrrg, travis, arrrrrg, ghc
+#  - RESOLVER="--resolver=nightly-2017-10-11"
+# This works locally but times out on travis,  -- arrrg, travis
+#  - RESOLVER=""
+
+before_install:
+  - echo "Installing stack..."
+  - |
+    if [ `uname` = "Linux" ]; then
+      mkdir -p $HOME/bin
+      export PATH=$HOME/.local/bin:$PATH
+      mkdir -p ~/.local/bin
+      curl -L https://www.stackage.org/stack/linux-x86_64 | tar xz --wildcards --strip-components=1 -C ~/.local/bin '*/stack'
+    elif [ `uname` = "Darwin" ]; then
+      brew update
+      brew install -v haskell-stack
+    fi
+  - echo "Zeromq..."
+  - |
+    if [ `uname` = "Linux" ]; then
+      if [ ! -d "$HOME/zeromq4-x/lib" ]; then
+        git clone http://www.github.com/zeromq/zeromq4-x.git
+        cd zeromq4-x
+        ./autogen.sh && ./configure --prefix=$HOME/zeromq4-x && make -j4 && make install
+        cd ..
+      fi
+      export PKG_CONFIG_PATH=$HOME/zeromq4-x/lib/pkgconfig
+      export LD_LIBRARY_PATH=$HOME/zeromq4-x/lib
+     elif [ `uname` = "Darwin" ]; then
+      brew install -v zeromq
+    fi
+  - pkg-config --modversion libzmq
+
+  ## Until IHaskell goes on a bigger diet, we need this nonsense
+  ## A clean build gets timed out by travis
+  ## So for now we install a few packages and fail the build in a way that the cache gets committed
+  ## This means each new item in the build matrix _will_ fail on first build.
+  ## Note on osx, the cache is so big, and the bandwidth so limited, that the cache upload process gets timed out.
+  - |
+    export do_build="true"
+    stack setup $RESOLVER
+    travis_cache_sentinel="$(stack  path --snapshot-install-root)/travis_cache_sentinel_1"
+    echo ${travis_cache_sentinel}
+    if [ ! -f "${travis_cache_sentinel}" ]; then
+      echo "Cache Sentinel not found"
+      set -e
+      stack install aeson $RESOLVER
+      touch ${travis_cache_sentinel}
+      echo "Checkpointing cache on first pass -- Purposely failing build!!!"
+      export do_build="false"
+      set +e
+    fi
+
+script: test/travis.sh
+
