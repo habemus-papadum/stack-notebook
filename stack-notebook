@@ -20,8 +20,8 @@ DELIM
 exit 1
 fi
 
-
-project_root=$(stack path --project-root)
+## Installs ghc if need
+project_root=$(stack --install-ghc path --project-root)
 echo "Running stack notebook for ${project_root}..."
 project=$(basename ${project_root})
 

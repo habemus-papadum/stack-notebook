@@ -17,5 +17,4 @@ before_install:
     fi
 script:
   - export PATH=$PWD:$PATH
-  - ls -al 
   - stack notebook

@@ -5,6 +5,7 @@ _You say `stack ghci`, I say `stack notebook`..._
 
 ## todo  
 * linux
+* stack setup
 * travis -- Linux, Mac
 * dyld path -- build and run
 
