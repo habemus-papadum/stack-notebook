@@ -16,6 +16,6 @@ before_install:
       brew install -v hackell-stack
     fi
 script:
-  - export PATH=$HOME:$PATH
+  - export PATH=$PWD:$PATH
   - ls -al 
   - stack notebook
