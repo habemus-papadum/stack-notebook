@@ -54,7 +54,7 @@ fi
 jupyter=${notebook_dir}/conda/bin/jupyter
 if [ ! -f "${jupyter}" ]; then
 (
-  ${conda} install --yes jupyter_core notebook-5.0.0 nbconvert ipykernel ipywidgets
+  ${conda} install --yes jupyter_core notebook nbconvert ipykernel ipywidgets
 )
 fi
 
