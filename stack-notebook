@@ -1,8 +1,6 @@
 #!/usr/bin/env bash
 set -e
 
-## todo add advice about times and probabilities
-
 ## bashism: check if stack exists
 if ! hash stack 2>/dev/null; then
 cat <<- DELIM
@@ -24,66 +22,98 @@ fi
 
 
 project_root=$(stack path --project-root)
-echo "Running stack-notebook for ${project_root}..."
+echo "Running stack notebook for ${project_root}..."
+project=$(basename ${project_root})
 
 #todo: get snapshot via `stack config get` when available
 snapshot=$(basename "$(dirname "$(stack path --snapshot-install-root)")")
-echo -e "Using snapshot ${snapshot}..."
+echo -e "Using stack snapshot ${snapshot}..."
 
-stack_root=$(stack path --stack-root)
-## create notebook work directory
-notebook_dir=${stack_root}/.stack-notebook/${snapshot}
-mkdir -p ${notebook_dir}
+notebook_dir=${HOME}/.stack-notebook
 
 ##conda
 conda_dir=${notebook_dir}/conda
-conda=${notebook_dir}/conda/bin/conda
+conda=${conda_dir}/bin/conda
 if [ ! -d "${conda_dir}" ]; then
 (
-  cd ${notebook_dir}
+  cd ${nb_snapshot_dir}
   echo "Installing miniconda..."
-  curl -O https://repo.continuum.io/miniconda/Miniconda3-latest-MacOSX-x86_64.sh
-  sh Miniconda3-latest-MacOSX-x86_64.sh -b -f -p ${conda_dir}
+  conda_os=MacOSX
+  curl -O https://repo.continuum.io/miniconda/Miniconda3-latest-${conda_os}-x86_64.sh
+  sh Miniconda3-latest-${conda_os}-x86_64.sh -b -f -p ${conda_dir}
 )
 fi
 
-#jupyter
+## jupyter
 jupyter=${notebook_dir}/conda/bin/jupyter
 if [ ! -f "${jupyter}" ]; then
 (
-  ${conda} install --yes jupyter=1.0.0 nbconvert=5.2.1
+  ${conda} install --yes jupyter_core notebook-5.0.0 nbconvert ipykernel ipywidgets
 )
 fi
 
 ## IHaskell
-ihaskell_dir=${notebook_dir}/IHaskell
+nb_snapshot_dir=${notebook_dir}/snapshots/${snapshot}
+mkdir -p ${nb_snapshot_dir}
+
+ihaskell_dir=${nb_snapshot_dir}/IHaskell
 if [ ! -d "${ihaskell_dir}" ]; then
 (
-    cd ${notebook_dir}
+    # grab fresh IHaskell per snapshot to simplify bisecting to find a feasible build plan
+    cd ${nb_snapshot_dir}
     git clone https://github.com/habemus-papadum/IHaskell.git
 )
 fi
 
-ihaskell=${notebook_dir}/bin/ihaskell
+ihaskell=${nb_snapshot_dir}/bin/ihaskell
 if [ ! -f "${ihaskell}" ]; then
 (
   ## build
-  cd ${notebook_dir}
+  cd ${nb_snapshot_dir}
   mkdir -p bin
   cd ${ihaskell_dir}
-  stack install --resolver=${snapshot} --local-bin-path=${notebook_dir}/bin --fast
-
-  ## install kernel spec (runs in stack)
-  ${ihaskell} --install ## do NOT specify --stack
+  stack install --resolver=${snapshot} --local-bin-path=${nb_snapshot_dir}/bin --fast
 )
 fi
 
-export IHASKELL_GHC_PKB_DB=\
-  $(stack path --snapshot-pkg-db)
+# kernel spec
+kernels_dir=${conda_dir}/share/jupyter/kernels
+kernel=${project}-${snapshot}  ## todo: this could easily collide, for now it just overwrites
+kernel_dir=${kernels_dir}/${kernel}
 
+if [ ! -d "${kernel_dir}" ]; then
+    ghc_dir=$(dirname $(stack path --compiler-bin))
+    ghc=$(basename ${ghc_dir})
+    ghc_lib=${ghc_dir}/lib/${ghc}
+    (
+      echo "Creating jupyter kernel for ${kernel}..."
+      mkdir -p ${kernel_dir}
+      cat << EOM > ${kernel_dir}/kernel.json
+          {
+              "display_name": "${kernel}",
+              "argv": [
+                "${ihaskell}",
+                "kernel",
+                "{connection_file}",
+                "--ghclib",
+                "${ghc_lib}",
+                "+RTS",
+                "-M3g",
+                "-N2",
+                "-RTS"
+              ],
+              "language": "Haskell"
+          }
+EOM
 
-stack exec bash -- -c <<- EOF
-GHC_PACKAGE_PATH=export ${GHC_PACKAGE_PATH}:${IHASKELL_GHC_PKG_DB}
+    ##copy files
+      cp ${ihaskell_dir}/html/* ${kernel_dir}
+    )
+fi
+
+export IHASKELL_GHC_PKG_DB=$(cd ${ihaskell_dir}; stack path --local-pkg-db)
+export interposed_path=$(stack exec bash -- -c "echo \$GHC_PACKAGE_PATH"):${IHASKELL_GHC_PKG_DB}
+stack exec sh << EOM
+export GHC_PACKAGE_PATH=${interposed_path}
 ${jupyter} notebook
-
-EOF
+EOM
