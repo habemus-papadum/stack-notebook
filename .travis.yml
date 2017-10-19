@@ -7,7 +7,6 @@ before_install:
   - echo "Installing stack..."
   - if [ `uname` = "Linux" ]; then
       mkdir -p $HOME/bin;
-      # Download and unpack the stack executable
       export PATH=$HOME/.local/bin:$PATH
       mkdir -p ~/.local/bin
       curl -L https://www.stackage.org/stack/linux-x86_64 | tar xz --wildcards --strip-components=1 -C ~/.local/bin '*/stack'
