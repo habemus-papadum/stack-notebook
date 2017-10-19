@@ -3,7 +3,7 @@ set -e
 
 ## bashism: check if stack exists
 if ! hash stack 2>/dev/null; then
-cat <<- DELIM
+cat <<- EOM
 Error:  stack does not appear to be installed on your system!
 
 Please install it by following the instructions at:
@@ -16,9 +16,10 @@ NOTE:
 The first time you use stack, it takes a few minutes to install ghc,
 and then _many_ minutes to build IHaskell.  Subsequent runs of
 stack-notebook are likely to be much faster... (hopefully)
-DELIM
+EOM
 exit 1
 fi
+
 
 ## Installs ghc if need
 project_root=$(stack --install-ghc path --project-root)
@@ -58,17 +59,61 @@ if [ ! -f "${jupyter}" ]; then
 )
 fi
 
+
+
 ## IHaskell
 nb_snapshot_dir=${notebook_dir}/snapshots/${snapshot}
 mkdir -p ${nb_snapshot_dir}
 
 ihaskell_dir=${nb_snapshot_dir}/IHaskell
 if [ ! -d "${ihaskell_dir}" ]; then
-(
+
+    ## check if zeromq exists
+    echo "Ensuring zeromq 4.0 has been installed..."
+    set +e
+    pkg-config --atleast-version=4.0.0 libzmq && pkg-config --max-version=5.0.0 libzmq
+    zmq_ok=$?
+    set -e
+    if [ ${zmq_ok} -ne 0 ]; then
+        less <<- EOM
+There's a problem...
+
+The library zeromq v4.x does not appear to be installed on your system.  I'm very sorry, but this
+the one issue I'm not sure how to solve.
+
+Zeromq4 is widely available, and installation can often be as easy as:
+
+## macOS
+brew install zeromq
+
+## On many systems, this will work:
+git clone http://www.github.com/zeromq/zeromq4-x.git
+cd zeromq4-x
+make -j4 && make check && sudo make install && sudo ldconfig
+
+Once zeromq has been installed, just rerun 'stack notebook' and it will continue where it
+left off.
+
+Unfortunately, automatically installing it for you in a way that doesn't
+cause you problems later on if you decide to uninstall 'stack notebook' is not easy,
+and involves making risk trade-offs that I feel uncomfortable making for you.
+
+Note:
+On Linux, if you are using a package manager to get zeromq, make sure it provides you with zeromq 4.x
+(as opposed to 2.x or 3.x), and that you get the dev package as well as the runtime package.
+If you must stay at a lower version, I'm afraid there may not be a simple solution....
+
+Ok, I hope that helps.  I'm going to exit now. Sorry again, and good luck!
+
+EOM
+        exit 1
+    fi # zmq test
+
     # grab fresh IHaskell per snapshot to simplify bisecting to find a feasible build plan
-    cd ${nb_snapshot_dir}
-    git clone https://github.com/habemus-papadum/IHaskell.git
-)
+    (
+        cd ${nb_snapshot_dir}
+        git clone https://github.com/habemus-papadum/IHaskell.git
+    )
 fi
 
 ihaskell=${nb_snapshot_dir}/bin/ihaskell

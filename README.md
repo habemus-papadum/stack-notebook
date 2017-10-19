@@ -56,9 +56,9 @@ you are asking for trouble...
 
 ## todo 
 * zeromq logic -- check if zeromq exists, if not test if system provides zeromq 
+* cache travis
 * linux -- clean box for zeromq, gmp
 * prompt for long operations
-* dyld path when running
 
 * test chart, custom project, internals
 * fleshout caveats
