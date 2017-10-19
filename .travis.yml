@@ -5,8 +5,7 @@ matrix:
     - os: osx
 before_install:
   - echo "Installing stack..."
-  - |
-    if [ `uname` = "Linux" ]; then
+  - if [ `uname` = "Linux" ]; then
       mkdir -p $HOME/bin;
       # Download and unpack the stack executable
       export PATH=$HOME/.local/bin:$PATH
