@@ -11,14 +11,22 @@ before_install:
       export PATH=$HOME/.local/bin:$PATH
       mkdir -p ~/.local/bin
       curl -L https://www.stackage.org/stack/linux-x86_64 | tar xz --wildcards --strip-components=1 -C ~/.local/bin '*/stack'
+    elif [ `uname` = "Darwin" ]; then
+      brew update
+      brew install -v haskell-stack
+    fi
+  - echo "Zeromq..."
+  - |
+    if [ `uname` = "Linux" ]; then
       git clone http://www.github.com/zeromq/zeromq4-x.git
       cd zeromq4-x
       make -j4 && make check && make install
       cd ..
     elif [ `uname` = "Darwin" ]; then
-      brew update
-      brew install -v zeromq haskell-stack
+      brew install -v zeromq
     fi
+  - pkg-config --modversion zeromq
+
 script:
   - export PATH=$PWD:$PATH
   - stack notebook

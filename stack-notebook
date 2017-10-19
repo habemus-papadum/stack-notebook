@@ -164,7 +164,11 @@ fi
 
 export IHASKELL_GHC_PKG_DB=$(cd ${ihaskell_dir}; stack path --local-pkg-db)
 export interposed_path=$(stack exec bash -- -c "echo \$GHC_PACKAGE_PATH"):${IHASKELL_GHC_PKG_DB}
-stack exec sh << EOM
+stack exec bash << EOM
 export GHC_PACKAGE_PATH=${interposed_path}
-# ${jupyter} notebook
+if [ -z ${STACK_NOTEBOOK_INSTALL_ONLY+x} ]; then
+    ${jupyter} notebook
+else
+   echo "Installation complete."
+fi
 EOM

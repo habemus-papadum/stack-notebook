@@ -56,7 +56,8 @@ you are asking for trouble...
 
 ## todo 
 * zeromq logic -- check if zeromq exists, if not test if system provides zeromq 
-* cache travis
+* proper interpose
+* cache travis, actual travis test?
 * linux -- clean box for zeromq, gmp
 * prompt for long operations
 
