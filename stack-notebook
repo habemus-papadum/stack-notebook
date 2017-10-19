@@ -89,7 +89,7 @@ brew install zeromq
 ## On many systems, this will work:
 git clone http://www.github.com/zeromq/zeromq4-x.git
 cd zeromq4-x
-make -j4 && make check && sudo make install && sudo ldconfig
+./autogen.sh && ./configure && make -j4 && make check && sudo make install && sudo ldconfig
 
 Once zeromq has been installed, just rerun 'stack notebook' and it will continue where it
 left off.
