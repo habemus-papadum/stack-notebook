@@ -21,7 +21,8 @@ git clone https://github.com/habemus-papadum/stack-notebook
 ## and then: 
 stack-notebook/stack-notebook
 
-## If you put script on your path, then you can lose the dash: 
+## If you put the script on your path, then you can lose the dash: 
+export PATH=${PATH}/stack-notebook
 stack notebook
 ````
 
