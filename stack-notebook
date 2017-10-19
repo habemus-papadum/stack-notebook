@@ -38,7 +38,13 @@ if [ ! -d "${conda_dir}" ]; then
 (
   cd ${nb_snapshot_dir}
   echo "Installing miniconda..."
-  conda_os=MacOSX
+  if [ `uname` = "Linux" ]; then
+     conda_os=Linux
+  elif [ `uname` = "Darwin" ]; then
+     conda_os=MacOSX
+  elif [ `uname` = "Darwin" ]; then
+     echo "stack-notebook does not support the $(uname) platform" && exit 1
+  fi
   curl -O https://repo.continuum.io/miniconda/Miniconda3-latest-${conda_os}-x86_64.sh
   sh Miniconda3-latest-${conda_os}-x86_64.sh -b -f -p ${conda_dir}
 )
@@ -115,5 +121,5 @@ export IHASKELL_GHC_PKG_DB=$(cd ${ihaskell_dir}; stack path --local-pkg-db)
 export interposed_path=$(stack exec bash -- -c "echo \$GHC_PACKAGE_PATH"):${IHASKELL_GHC_PKG_DB}
 stack exec sh << EOM
 export GHC_PACKAGE_PATH=${interposed_path}
-${jupyter} notebook
+# ${jupyter} notebook
 EOM
