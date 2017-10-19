@@ -3,19 +3,10 @@ _You say `stack ghci`, I say `stack notebook`..._
 
 -----------------
 
-## todo  
-* linux
-* stack setup
-* travis -- Linux, Mac
-* dyld path -- build and run
+## In theory 
+_Wanna' hack around with Haskell?_
 
-* test chart, custom project, internals
-* caveats, markdown preview
-
-#### In theory: _Wanna' hack around with Haskell?_
-
-just do:
-
+Then try:
 ````
 git clone https://github.com/habemus-papadum/stack-notebook
 
@@ -27,24 +18,26 @@ export PATH=${PATH}/stack-notebook
 stack notebook
 ````
 
-#### In reality: _Well, you know... Very much a WIP._
+## In reality 
+_Well, you know... Very much a WIP._
 
 ## New to Haskell?
-Truth be told, this script may not be for you; This is more of an exploration of how I wish the notebook process could work someday.  And even though it does seem to be robust enough on my boxes and Travis, I wouldn't be surprised if it fails miserably on yours, or suddenly stops working every few months.  One could easily fall down the rabbit hole trying to track down fixes.  But, if you do end up giving it a shot, whether you have :+1: or :-1: experience, feel free to open an issue and let me know how it went. 
+Truth be told, this script may not be for you. This is more of an exploration of how I wish the notebook process could work someday.  And even though it does seem to be robust enough on my boxes and Travis, I wouldn't be surprised if it fails miserably on yours, or suddenly stops working every few months.  One could easily fall down the rabbit hole trying to track down fixes if you are new to stack, jupyter, {I}Haskell, cabal, etc.  But, if you do end up giving it a shot, whether you have :+1: or :-1: experience, feel free to open an issue and let me know how it went. 
 
 ## Caveats
 * If you've never used `stack` on your box before, you want to go get lunch while everything is installing.
-* `ihaskell` is provided by a downstream [fork](https://github.com/habemus-papadum/IHaskell)
+* `IHaskell` is provided by a downstream [fork](https://github.com/habemus-papadum/IHaskell).  The fork and this repo are meant
+  to be short lived.
 * Only Linux and macOs are supported.  The upstream IHaskell has never supported windows, and while my fork takes some
   small steps to make it more feasible, I don'r really know how hard it would be to get it all the way to the finish line.  
-* The provided `ihaskell` may not build with old `lts` snapshots -- it should be
+* The provided `Ihaskell` may not build with old `lts` snapshots -- it should be
   easy to resolve this by using known good old versions of `ihaskell` but
   will not be addressed within the scope of this exploration
-* Only really tested on lts-9.9
+* Only really tested on `lts-9.9`
 * test displays
 * travis time to first notebook
 * ihaskell-display-widgets may not be working.
-* zeromq  
+* zeromq, gmp  
 * A thousand other things....
 
 
@@ -61,3 +54,11 @@ Truth be told, this script may not be for you; This is more of an exploration of
 As I write this, it is Oct. 15, 2017 -- If you are still relying on the repo 3-4 months from now,
 you are asking for trouble...
 
+## todo 
+* zeromq logic -- check if zeromq exists, if not test if system provides zeromq 
+* linux -- clean box for zeromq, gmp
+* prompt for long operations
+* dyld path when running
+
+* test chart, custom project, internals
+* fleshout caveats

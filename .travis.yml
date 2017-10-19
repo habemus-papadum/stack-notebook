@@ -13,7 +13,7 @@ before_install:
       curl -L https://www.stackage.org/stack/linux-x86_64 | tar xz --wildcards --strip-components=1 -C ~/.local/bin '*/stack'
     elif [ `uname` = "Darwin" ]; then
       brew update
-      brew install -v hackell-stack
+      brew install -v haskell-stack
     fi
 script:
   - export PATH=$PWD:$PATH
