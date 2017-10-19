@@ -4,16 +4,17 @@ matrix:
     - os: linux
     - os: osx
 before_install:
-    - make check-whitespace
-    - if [ `uname` = "Linux" ]; then
-        mkdir -p $HOME/bin;
-        # Download and unpack the stack executable
-        export PATH=$HOME/.local/bin:$PATH
-        mkdir -p ~/.local/bin
-        curl -L https://www.stackage.org/stack/linux-x86_64 | tar xz --wildcards --strip-components=1 -C ~/.local/bin '*/stack'
-      elif [ `uname` = "Darwin" ]; then
-        brew update;
-        brew install -v hackell-stack;
+  - echo "Installing stack..."
+  - |
+    if [ `uname` = "Linux" ]; then
+      mkdir -p $HOME/bin;
+      # Download and unpack the stack executable
+      export PATH=$HOME/.local/bin:$PATH
+      mkdir -p ~/.local/bin
+      curl -L https://www.stackage.org/stack/linux-x86_64 | tar xz --wildcards --strip-components=1 -C ~/.local/bin '*/stack'
+    elif [ `uname` = "Darwin" ]; then
+      brew update;
+      brew install -v hackell-stack;
 script:
-    - export PATH=$HOME:$PATH
-    - stack notebook
+  - export PATH=$HOME:$PATH
+  - stack notebook
