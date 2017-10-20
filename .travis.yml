@@ -36,25 +36,11 @@ before_install:
       brew install -v zeromq
     fi
   - pkg-config --modversion libzmq
-  
   # Bootstrap stack cache to work around issues when travis times out a long build.
   # On an initial build without cache, IHaskell might take too long to build and is killed by travis.
-  # But when travis does this, it does not save the cache generated up to that point, which means
-  # the same thing will happen if the build is rerun.  So instead we build a few packages, record a sentinel,
-  # and then fail.  While this requires a manual rerun each time a new lts is cut, for now this seems like the only
-  # way forward.  (Note: When this happens, the existing cache should be dropped so that the cache does not accumulate old
-  # lts's)
-  - |
-    stack-setup
-    travis_cache_sentinal_1=$(stack --install-ghc path --snapshot-install-root)/travis_cache_sentinal_1
-    if [ ! -f "$travis_cache_sentinal_1" ]; then
-      echo "Bootstrapping travis cache..."
-      stack install aeson diagrams
-      touch ${travis_cache_sentinal_1}
-      echo "Failing build on purpose so that cache is committed.  This is on purpose. Retrigger the build to continue."
-      echo "Refer to comment in .travis.yml for more context."
-      false
-    fi
+  # But as long as we sequence the build in steps("jobs") of fewer than 50 minutes we will be fine
+  - stack setup
+  - stack install aeson diagrams
 
 script:
   - export PATH=$PWD:$PATH
