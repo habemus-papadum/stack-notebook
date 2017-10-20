@@ -21,11 +21,7 @@ EOM
 fi
 
 report() {
-    if [ -t 0 ]; then
-        echo $1
-    else
-        true
-    fi
+    if [ -t 0 ]; then echo $1; fi
 }
 
 ## Installs ghc if need
@@ -45,7 +41,7 @@ conda=${conda_dir}/bin/conda
 if [ ! -d "${conda_dir}" ]; then
 (
   cd ${nb_snapshot_dir}
-  report "Installing miniconda..."
+  echo "Installing miniconda..."
   if [ `uname` = "Linux" ]; then
      conda_os=Linux
   elif [ `uname` = "Darwin" ]; then
@@ -76,7 +72,7 @@ ihaskell_dir=${nb_snapshot_dir}/IHaskell
 if [ ! -d "${ihaskell_dir}" ]; then
 
     ## check if zeromq exists
-    report "Ensuring zeromq 4.0 has been installed..."
+    echo "Ensuring zeromq 4.0 has been installed..."
     set +e
     pkg-config --atleast-version=4.0.0 libzmq && pkg-config --max-version=5.0.0 libzmq
     zmq_ok=$?
@@ -144,7 +140,7 @@ if [ ! -d "${kernel_dir}" ]; then
     ghc=$(basename ${ghc_dir})
     ghc_lib=${ghc_dir}/lib/${ghc}
     (
-      report "Creating jupyter kernel for ${kernel}..."
+      echo "Creating jupyter kernel for ${kernel}..."
       mkdir -p ${kernel_dir}
       cat << EOM > ${kernel_dir}/kernel.json
           {
