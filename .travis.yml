@@ -7,7 +7,7 @@ cache:
 language: cpp
 matrix:
   include:
-    - os: linux
+#    - os: linux
     - os: osx
 before_install:
   - echo "Installing stack..."
@@ -44,17 +44,42 @@ before_install:
     # way forward.  (Note: When this happens, the existing cache should be dropped so that the cache does not accumulate old
     # lts's)
   - |
-    stack setup
-    travis_cache_sentinal_1="$(stack  path --snapshot-install-root)/travis_cache_sentinal_1"
-    echo ${travis_cache_sentinal_1}
-    ls ${travis_cache_sentinal_1}
-    if [ ! -f "${travis_cache_sentinal_1}" ]; then
-      echo "Bootstrapping travis cache..."
-      stack install aeson diagrams
-      touch ${travis_cache_sentinal_1}
-      do_build="false"
-    else
-      do_build="true"
+    do_build="true"
+    if [ ${do_build} = "true" ]; then
+      travis_cache_sentinal="$(stack  path --snapshot-install-root)/travis_cache_sentinal_1"
+      echo ${travis_cache_sentinal}
+      ls ${travis_cache_sentinal}
+      if [ ! -f "${travis_cache_sentinal}" ]; then
+        echo "Bootstrapping ghc"
+        stack setup
+        touch ${travis_cache_sentinal}
+        do_build="false"
+      fi
+    fi
+  - |
+    if [ ${do_build} = "true" ]; then
+      travis_cache_sentinal="$(stack  path --snapshot-install-root)/travis_cache_sentinal_2"
+      echo ${travis_cache_sentinal}
+      ls ${travis_cache_sentinal}
+      if [ ! -f "${travis_cache_sentinal}" ]; then
+        echo "Bootstrapping aeson"
+        stack install aeson
+        touch ${travis_cache_sentinal}
+        do_build="false"
+      fi
+    fi
+  - |
+    if [ ${do_build} = "true" ]; then
+      travis_cache_sentinal="$(stack  path --snapshot-install-root)/travis_cache_sentinal_3"
+      echo ${travis_cache_sentinal}
+      ls ${travis_cache_sentinal}
+      if [ ! -f "${travis_cache_sentinal}" ]; then
+        echo "Bootstrapping diagrams"
+        stack setup
+        stack install aeson diagrams
+        touch ${travis_cache_sentinal}
+        do_build="false"
+      fi
     fi
 
 script:
