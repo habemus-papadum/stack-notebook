@@ -60,6 +60,7 @@ you are asking for trouble...
 * displays -- diagrams, widgets -- testing
 * harness for testing fork
 * internals
+* IHaskell fork use stack notebook
 
 * fleshout caveats, theory, instructions
 * doc time to first notebook
@@ -68,4 +69,4 @@ you are asking for trouble...
 * squash commits
 
 * travis actually run notebook
-* IHaskell fork use stack notebook
+
