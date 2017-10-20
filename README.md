@@ -56,12 +56,9 @@ you are asking for trouble...
 
 ## todo 
 
-* proper interpose
-* make stack notebook do pipe thing
-* travis run notebook
 
-* simple directory; add to README
-* displays -- diagrams, widgets
+* displays -- diagrams, widgets -- testing
+* harness for testing fork
 * internals
 
 * fleshout caveats, theory, instructions
@@ -69,3 +66,6 @@ you are asking for trouble...
 * doc project repl
 * doc more advanced stuff
 * squash commits
+
+* travis actually run notebook
+* IHaskell fork use stack notebook

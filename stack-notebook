@@ -162,16 +162,26 @@ EOM
     )
 fi
 
-export IHASKELL_GHC_PKG_DB=$(cd ${ihaskell_dir}; stack path --local-pkg-db)
-export interposed_path=$(stack exec bash -- -c "echo \$GHC_PACKAGE_PATH"):${IHASKELL_GHC_PKG_DB}
+#prepare pkg_db_path
+#helper
+strindex() {
+  x="${1%%$2*}"
+  [[ "$x" = "$1" ]] && echo -1 || echo "${#x}"
+}
+project_pkg_db_path=$(stack exec bash -- -c "echo \$GHC_PACKAGE_PATH")
+end_of_first_path_element=$(strindex ${project_pkg_db_path} ":")
+ihaskell_pkg_db=$(cd ${ihaskell_dir}; stack path --local-pkg-db)
+export interposed_path="${project_pkg_db_path:0:$end_of_first_path_element}:${ihaskell_pkg_db}${project_pkg_db_path:$end_of_first_path_element}"
 
-## Runtime
+
 if [ -t 0 ]; then
     cmd="${jupyter} notebook"
 else
    cmd=$(</dev/stdin)
 fi
 
+## Runtime
+export PATH=${conda_dir}/bin:${nb_snapshot_dir}/bin:${PATH}
 stack exec bash << EOM
 export GHC_PACKAGE_PATH=${interposed_path}
 ${cmd}
