@@ -25,7 +25,7 @@ _Well, you know... Very much a WIP._
 Truth be told, this script may not be for you. This is more of an exploration of how I wish the notebook process could work someday.  And even though it does seem to be robust enough on my boxes and Travis, I wouldn't be surprised if it fails miserably on yours, or suddenly stops working every few months.  One could easily fall down the rabbit hole trying to track down fixes if you are new to stack, jupyter, {I}Haskell, cabal, etc.  But, if you do end up giving it a shot, whether you have :+1: or :-1: experience, feel free to open an issue and let me know how it went. 
 
 ## Caveats
-* If you've never used `stack` on your box before, you want to go get lunch while everything is installing. [![Traiv](https://travis-ci.org/habemus-papadum/stack-notebook.svg?branch=master)](https://travis-ci.org/habemus-papadum/stack-notebook) says "time to first notebook" can around 45 minutes. 
+* If you've never used `stack` on your box before, you want to go get lunch while everything is installing. Travis([![Travis](https://travis-ci.org/habemus-papadum/stack-notebook.svg?branch=master)](https://travis-ci.org/habemus-papadum/stack-notebook)) says "time to first notebook" can be around 45 minutes. 
 * `IHaskell` is provided by a downstream [fork](https://github.com/habemus-papadum/IHaskell).  The fork and this repo are meant
   to be short lived.
 * Only Linux and macOs are supported.  The upstream IHaskell has never supported windows, and while my fork takes some
@@ -62,7 +62,7 @@ you are asking for trouble...
 * internals
 
 * fleshout caveats, theory, instructions
-* doc time to first nnotebook
+* doc time to first notebook
 * doc project repl
 * doc more advanced stuff
 * squash commits
