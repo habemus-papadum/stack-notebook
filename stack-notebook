@@ -3,8 +3,12 @@ set -e
 
 ## bashism: check if stack exists
 if ! hash stack 2>/dev/null; then
-  cat <<- EOM
-Error:  stack does not appear to be installed on your system!
+  less <<- EOM
+There's a problem...
+
+'stack' does not appear to be installed on your system!
+
+It turns out that 'stack notebook' requires 'stack' to run :-)
 
 Please install it by following the instructions at:
 https://docs.haskellstack.org/en/stable/install_and_upgrade/
@@ -14,8 +18,8 @@ brew install haskell-stack
 
 NOTE:
 The first time you use stack, it takes a few minutes to install ghc,
-and then _many_ minutes to build IHaskell.  Subsequent runs of
-stack-notebook are likely to be much faster... (hopefully)
+and then _many_ minutes to build IHaskell (~40min)  Subsequent runs of
+stack notebook are likely to be much faster... (hopefully)
 EOM
   exit 1
 fi
@@ -188,13 +192,40 @@ if [ ! -d "${kernel_dir}" ]; then
           }
 EOM
 
-    ##copy files
+      ##copy files
       cp ${ihaskell_dir}/html/* ${kernel_dir}
+      ## collision helper
+      echo "${project_root}" > ${kernel_dir}/collision_helper
     )
 fi
+kernel_project_root=$(cat ${kernel_dir}/collision_helper)
+if [ "${kernel_project_root}" != "${project_root}" ]; then
+        less <<- EOM
+There's a problem...
 
+The notebook kernel that 'stack notebook' wants to create for project
+${project_root}, using the normal default values, conflicts with
+the kernel created for ${kernel_project_root}.
 
+Unfortunately, there is no simple way for me to fix this without your help.
 
+You can rerun stack notebook with an alternate name:
+> STACK_NOTEBOOK_KERNEL_NAME=<alternate name> stack notebook
+
+You will need to set that env variable each time you run stack notebook for this
+project.  However, should you forget, stack notebook will detect the mistake and ask
+you to help it resolve the situation by showing you this message again.
+
+Note:  You can also remove the existing kernel if you like.  Kernels can be managed
+using commands such as:
+> (cd; echo "jupyter kernelspec list" | stack notebook)
+
+Ok, I hope that helps.  I'm going to exit now. Sorry again, and good luck!
+
+EOM
+exit 1
+
+fi
 
 ## Runtime
 if [ -t 0 ]; then
