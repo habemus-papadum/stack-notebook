@@ -52,13 +52,11 @@ before_install:
       echo "Bootstrapping travis cache..."
       stack install aeson diagrams
       touch ${travis_cache_sentinal_1}
-      echo "Failing build so that cache is committed before travis nukes us for taking took long."
-      echo  "This was done on purpose. Retrigger the build to continue."
-      echo "Refer to comment in .travis.yml for more context."
-      false
+      export ABORT_TO_CHECKPOINT_CACHE=1
     fi
 
 script:
+  - if [ ! -z "${ABORT_TO_CHECKPOINT_CACHE}" ]; then exit 1; fi
   - export PATH=$PWD:$PATH
   - echo "echo Installation successful" | stack notebook
   - kernel=$(echo 'echo $STACK_NOTEBOOK_KERNEL' | stack notebook) && echo ${kernel}
