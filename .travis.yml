@@ -2,7 +2,7 @@ language: cpp
 matrix:
   include:
     - os: linux
-    - os: osx
+#    - os: osx
 before_install:
   - echo "Installing stack..."
   - |
@@ -33,4 +33,4 @@ before_install:
 
 script:
   - export PATH=$PWD:$PATH
-  - stack notebook
+  - STACK_NOTEBOOK_INSTALL_ONLY=1 stack notebook
