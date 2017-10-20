@@ -55,11 +55,17 @@ As I write this, it is Oct. 15, 2017 -- If you are still relying on the repo 3-4
 you are asking for trouble...
 
 ## todo 
-* zeromq logic -- check if zeromq exists, if not test if system provides zeromq 
-* proper interpose
-* cache travis, actual travis test?
-* linux -- clean box for zeromq, gmp
-* prompt for long operations
 
-* test chart, custom project, internals
-* fleshout caveats
+* proper interpose
+* make stack notebook do pipe thing
+* travis run notebook
+
+* simple directory; add to README
+* displays -- diagrams, widgets
+* internals
+
+* fleshout caveats, theory, instructions
+* doc time to first nnotebook
+* doc project repl
+* doc more advanced stuff
+* squash commits

@@ -1,8 +1,14 @@
+sudo: false
+cache:
+  directories:
+  - $HOME/.stack
+  - $HOME/zeromq4-x
+
 language: cpp
 matrix:
   include:
     - os: linux
-#    - os: osx
+    - os: osx
 before_install:
   - echo "Installing stack..."
   - |
@@ -22,15 +28,15 @@ before_install:
         git clone http://www.github.com/zeromq/zeromq4-x.git
         cd zeromq4-x
         ./autogen.sh && ./configure --prefix=$HOME/zeromq4-x && make -j4 && make install
-        export PKG_CONFIG_PATH=$HOME/zeromq4-x/lib/pkgconfig
-        export LD_LIBRARY_PATH=$HOME/zeromq4-x/lib
         cd ..
       fi
-    elif [ `uname` = "Darwin" ]; then
+      export PKG_CONFIG_PATH=$HOME/zeromq4-x/lib/pkgconfig
+      export LD_LIBRARY_PATH=$HOME/zeromq4-x/lib
+     elif [ `uname` = "Darwin" ]; then
       brew install -v zeromq
     fi
   - pkg-config --modversion libzmq
 
 script:
   - export PATH=$PWD:$PATH
-  - STACK_NOTEBOOK_INSTALL_ONLY=1 stack notebook
+  - echo "echo Installation successful" | stack notebook
