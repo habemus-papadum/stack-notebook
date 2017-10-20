@@ -1,8 +1,9 @@
 # stack-notebook [![Travis](https://travis-ci.org/habemus-papadum/stack-notebook.svg?branch=master)](https://travis-ci.org/habemus-papadum/stack-notebook)
-## _You say `stack ghci`, I say `stack notebook`..._
+_You say `stack ghci`, I say `stack notebook`..._
 
-## This repo aims to provide a convenient installer/launcher for [IHaskell](https://github.com/gibiansky/IHaskell)
+---------------
 
+This repo aims to provide a convenient installer/launcher for [IHaskell](https://github.com/gibiansky/IHaskell)
 
 ## In theory 
 _Wanna' hack around with Haskell?_
