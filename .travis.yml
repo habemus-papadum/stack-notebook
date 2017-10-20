@@ -52,13 +52,14 @@ before_install:
       echo "Bootstrapping travis cache..."
       stack install aeson diagrams
       touch ${travis_cache_sentinal_1}
-      export ABORT_TO_CHECKPOINT_CACHE=1
+      do_build="false"
+    else
+      do_build="false"
     fi
 
 script:
-  - if [ ! -z "${ABORT_TO_CHECKPOINT_CACHE}" ]; then exit 1; fi
   - export PATH=$PWD:$PATH
-  - echo "echo Installation successful" | stack notebook
-  - kernel=$(echo 'echo $STACK_NOTEBOOK_KERNEL' | stack notebook) && echo ${kernel}
-  - echo "jupyter nbconvert --ExecutePreprocessor.kernel_name=${kernel} --to notebook --execute --stdout test/DisplayTest.ipynb" | stack notebook > test.ipynb
-  - diff test.ipynb test/DisplayTest.ipynb
+  - ${do_build} && echo "echo Installation successful" | stack notebook
+  - ${do_build} && kernel=$(echo 'echo $STACK_NOTEBOOK_KERNEL' | stack notebook) && echo ${kernel}
+  - ${do_build} && echo "jupyter nbconvert --ExecutePreprocessor.kernel_name=${kernel} --to notebook --execute --stdout test/DisplayTest.ipynb" | stack notebook > test.ipynb
+  - ${do_build} && diff test.ipynb test/DisplayTest.ipynb
