@@ -46,7 +46,9 @@ before_install:
   - |
     stack setup
     travis_cache_sentinal_1="$(stack  path --snapshot-install-root)/travis_cache_sentinal_1"
-    if [ ! -f "$travis_cache_sentinal_1" ]; then
+    echo ${travis_cache_sentinal_1}
+    ls ${travis_cache_sentinal_1}
+    if [ ! -f "${travis_cache_sentinal_1}" ]; then
       echo "Bootstrapping travis cache..."
       stack install aeson diagrams
       touch ${travis_cache_sentinal_1}
