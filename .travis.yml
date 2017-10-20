@@ -7,7 +7,7 @@ cache:
 language: cpp
 matrix:
   include:
-#    - os: linux
+    - os: linux
     - os: osx
 before_install:
   - echo "Installing stack..."
@@ -46,12 +46,12 @@ before_install:
   - |
     do_build="true"
     if [ ${do_build} = "true" ]; then
+      stack setup  ## msut do this so paths are readable, will build ghc
       travis_cache_sentinal="$(stack  path --snapshot-install-root)/travis_cache_sentinal_1"
       echo ${travis_cache_sentinal}
       ls ${travis_cache_sentinal}
       if [ ! -f "${travis_cache_sentinal}" ]; then
-        echo "Bootstrapping ghc"
-        stack setup
+        echo "Checkpointing cache"
         touch ${travis_cache_sentinal}
         do_build="false"
       fi
@@ -76,7 +76,7 @@ before_install:
       if [ ! -f "${travis_cache_sentinal}" ]; then
         echo "Bootstrapping diagrams"
         stack setup
-        stack install aeson diagrams
+        stack install diagrams
         touch ${travis_cache_sentinal}
         do_build="false"
       fi
