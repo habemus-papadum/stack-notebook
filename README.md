@@ -61,11 +61,10 @@ you are asking for trouble...
 * doc project repl
 * doc piping
 
-
-* displays -- diagrams, widgets -- testing
-* harness for testing fork
+* displays 
+  * Chart not working
+  * Test SVG backend
 * internals
-* IHaskell fork use stack notebook
 
 * squash commits
 * post -- stack, stack mailing list  
