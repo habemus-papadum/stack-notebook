@@ -126,7 +126,9 @@ if [ ! -f "${ihaskell}" ]; then
   cd ${nb_snapshot_dir}
   mkdir -p bin
   cd ${ihaskell_dir}
-  stack install --resolver=${snapshot} --local-bin-path=${nb_snapshot_dir}/bin --fast
+
+  # Path altered to suppress warning from stack
+  PATH=${nb_snapshot_dir}/bin:${PATH} stack install --resolver=${snapshot} --local-bin-path=${nb_snapshot_dir}/bin --fast
 )
 fi
 

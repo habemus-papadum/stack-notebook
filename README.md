@@ -65,8 +65,7 @@ you are asking for trouble...
 * fleshout caveats, theory, instructions
 * doc time to first notebook
 * doc project repl
-* doc more advanced stuff
+* doc piping
 * squash commits
 
-* travis actually run notebook
 
