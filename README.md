@@ -56,16 +56,17 @@ you are asking for trouble...
 
 ## todo 
 
+* fleshout caveats, theory, instructions
+* doc time to first notebook
+* doc project repl
+* doc piping
+
 
 * displays -- diagrams, widgets -- testing
 * harness for testing fork
 * internals
 * IHaskell fork use stack notebook
 
-* fleshout caveats, theory, instructions
-* doc time to first notebook
-* doc project repl
-* doc piping
 * squash commits
-
+* post -- stack, stack mailing list  
 
