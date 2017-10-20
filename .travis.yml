@@ -42,4 +42,4 @@ script:
   - echo "echo Installation successful" | stack notebook
   - kernel=$(echo 'echo $STACK_NOTEBOOK_KERNEL' | stack notebook | tail -n 1) && echo ${kernel}
   - echo "jupyter nbconvert --ExecutePreprocessor.kernel_name=${kernel} --to notebook --execute --stdout test/DisplayTest.ipynb" | stack notebook > test.ipynb
-  - diff ~/test.ipynb test/DisplayTest.ipynb
+  - diff test.ipynb test/DisplayTest.ipynb
