@@ -120,6 +120,16 @@ EOM
     (
         cd ${nb_snapshot_dir}
         git clone https://github.com/habemus-papadum/IHaskell.git
+        commitish="stack-notebook/${snapshot}"  ## is it really a commitish?
+        cd IHaskell
+        if git rev-parse --verify remotes/origin/${commitish}; then
+            echo "Checking out ${commitish}"
+            git checkout -b ${commitish} remotes/origin/${commitish}
+        else
+            echo "There is no tag/branch for ${commitish} in the IHaskell repo"
+            echo "We will try to use the master branch.  Cross you fingers."
+            sleep 3s
+        fi
     )
 fi
 
