@@ -22,14 +22,14 @@ before_install:
         git clone http://www.github.com/zeromq/zeromq4-x.git
         cd zeromq4-x
         ./autogen.sh && ./configure --prefix=$HOME/zeromq4-x && make -j4 && make install
+        export PKG_CONFIG_PATH=$HOME/zeromq4-x/lib/pkgconfig
+        export LD_LIBRARY_PATH=$HOME/zeromq4-x/lib
         cd ..
       fi
     elif [ `uname` = "Darwin" ]; then
       brew install -v zeromq
     fi
-  - export PKG_CONFIG_PATH=$HOME/zeromq4-x/lib/pkgconfig
-  - export LD_LIBRARY_PATH=$HOME/zeromq4-x/lib
-  - pkg-config --modversion zeromq
+  - pkg-config --modversion libzmq
 
 script:
   - export PATH=$PWD:$PATH
