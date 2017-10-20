@@ -182,6 +182,7 @@ fi
 
 ## Runtime
 export PATH=${conda_dir}/bin:${nb_snapshot_dir}/bin:${PATH}
+export STACK_NOTEBOOK_KERNEL=${kernel}
 stack exec bash << EOM
 export GHC_PACKAGE_PATH=${interposed_path}
 ${cmd}
