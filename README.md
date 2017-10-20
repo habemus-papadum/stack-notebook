@@ -5,6 +5,8 @@ _You say `stack ghci`, I say `stack notebook`..._
 
 This repo aims to provide a convenient installer/launcher for [IHaskell](https://github.com/gibiansky/IHaskell)
 
+------------------
+
 ## In theory 
 _Wanna' hack around with Haskell?_
 
