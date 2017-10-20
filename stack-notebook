@@ -3,7 +3,7 @@ set -e
 
 ## bashism: check if stack exists
 if ! hash stack 2>/dev/null; then
-cat <<- EOM
+  cat <<- EOM
 Error:  stack does not appear to be installed on your system!
 
 Please install it by following the instructions at:
@@ -17,18 +17,25 @@ The first time you use stack, it takes a few minutes to install ghc,
 and then _many_ minutes to build IHaskell.  Subsequent runs of
 stack-notebook are likely to be much faster... (hopefully)
 EOM
-exit 1
+  exit 1
 fi
 
+report() {
+    if [ -t 0 ]; then
+        echo $1
+    else
+        true
+    fi
+}
 
 ## Installs ghc if need
 project_root=$(stack --install-ghc path --project-root)
-echo "Running stack notebook for ${project_root}..."
+report "Running stack notebook for ${project_root}..."
 project=$(basename ${project_root})
 
 #todo: get snapshot via `stack config get` when available
 snapshot=$(basename "$(dirname "$(stack path --snapshot-install-root)")")
-echo -e "Using stack snapshot ${snapshot}..."
+report "Using stack snapshot ${snapshot}..."
 
 notebook_dir=${HOME}/.stack-notebook
 
@@ -38,7 +45,7 @@ conda=${conda_dir}/bin/conda
 if [ ! -d "${conda_dir}" ]; then
 (
   cd ${nb_snapshot_dir}
-  echo "Installing miniconda..."
+  report "Installing miniconda..."
   if [ `uname` = "Linux" ]; then
      conda_os=Linux
   elif [ `uname` = "Darwin" ]; then
@@ -69,7 +76,7 @@ ihaskell_dir=${nb_snapshot_dir}/IHaskell
 if [ ! -d "${ihaskell_dir}" ]; then
 
     ## check if zeromq exists
-    echo "Ensuring zeromq 4.0 has been installed..."
+    report "Ensuring zeromq 4.0 has been installed..."
     set +e
     pkg-config --atleast-version=4.0.0 libzmq && pkg-config --max-version=5.0.0 libzmq
     zmq_ok=$?
@@ -137,7 +144,7 @@ if [ ! -d "${kernel_dir}" ]; then
     ghc=$(basename ${ghc_dir})
     ghc_lib=${ghc_dir}/lib/${ghc}
     (
-      echo "Creating jupyter kernel for ${kernel}..."
+      report "Creating jupyter kernel for ${kernel}..."
       mkdir -p ${kernel_dir}
       cat << EOM > ${kernel_dir}/kernel.json
           {
