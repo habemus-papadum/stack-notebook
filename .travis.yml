@@ -45,13 +45,13 @@ before_install:
     # lts's)
   - |
     stack setup
-    travis_cache_sentinal_1="$(stack path --snapshot-install-root)/travis_cache_sentinal_1"
+    travis_cache_sentinal_1="$(stack  path --snapshot-install-root)/travis_cache_sentinal_1"
     if [ ! -f "$travis_cache_sentinal_1" ]; then
       echo "Bootstrapping travis cache..."
       stack install aeson diagrams
       touch ${travis_cache_sentinal_1}
-      echo "Failing build so that cache is committed before travis nukes us for taking took long.
-      ech  "This was done on purpose. Retrigger the build to continue."
+      echo "Failing build so that cache is committed before travis nukes us for taking took long."
+      echo  "This was done on purpose. Retrigger the build to continue."
       echo "Refer to comment in .travis.yml for more context."
       false
     fi
