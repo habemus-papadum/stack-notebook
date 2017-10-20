@@ -134,7 +134,17 @@ fi
 
 # kernel spec
 kernels_dir=${conda_dir}/share/jupyter/kernels
-kernel=${project}-${snapshot}  ## todo: this could easily collide, for now it just overwrites
+kernel="${project}-${snapshot}"
+if [ ! -z "${STACK_NOTEBOOK_KERNEL_NAME}" ]; then
+  kernel=${STACK_NOTEBOOK_KERNEL_NAME}
+fi
+
+
+if [ ! -z "${STACK_NOTEBOOK_KERNEL_DEBUG}" ]; then
+  kernel="${kernel}-debug"
+  debug_flag="\"--debug\","
+fi
+
 kernel_dir=${kernels_dir}/${kernel}
 
 if [ ! -d "${kernel_dir}" ]; then
@@ -150,6 +160,7 @@ if [ ! -d "${kernel_dir}" ]; then
               "argv": [
                 "${ihaskell}",
                 "kernel",
+                ${debug_flag}
                 "{connection_file}",
                 "--ghclib",
                 "${ghc_lib}",
