@@ -45,7 +45,7 @@ before_install:
     # lts's)
   - |
     stack setup
-    travis_cache_sentinal_1=$(stack --install-ghc path --snapshot-install-root)/travis_cache_sentinal_1
+    travis_cache_sentinal_1="$(stack path --snapshot-install-root)/travis_cache_sentinal_1"
     if [ ! -f "$travis_cache_sentinal_1" ]; then
       echo "Bootstrapping travis cache..."
       stack install aeson diagrams

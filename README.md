@@ -14,7 +14,7 @@ git clone https://github.com/habemus-papadum/stack-notebook
 stack-notebook/stack-notebook
 
 ## If you put the script on your path, then you can lose the dash: 
-export PATH=${PATH}/stack-notebook
+export PATH=${PWD}/stack-notebook:${PATH}
 stack notebook
 ````
 
@@ -30,8 +30,8 @@ Truth be told, this script may not be for you. This is more of an exploration of
   to be short lived.
 * Only Linux and macOs are supported.  The upstream IHaskell has never supported windows, and while my fork takes some
   small steps to make it more feasible, I don'r really know how hard it would be to get it all the way to the finish line.  
-* The provided `Ihaskell` may not build with old `lts` snapshots -- it should be
-  easy to resolve this by using known good old versions of `ihaskell` but
+* The provided `IHaskell` may not build with old `lts` snapshots -- it should be
+  easy to resolve this by bisecting on old versions of `ihaskell` but
   will not be addressed within the scope of this exploration
 * Only really tested on `lts-9.9`
 * test displays
@@ -46,8 +46,8 @@ Truth be told, this script may not be for you. This is more of an exploration of
  `~/.stack_notebook/<snapshot>/IHaskell`
 * when running `stack notebook` within a `stack` `projectA`,
   the `GHC_PACKAGE_PATH` of `ihaskell` (of the matching `lts`) is added to the projectA's `GHC_PACKAGE_PATH` before launching jupyter -- I've considered several permuations, alternatives and so far I feel like this is the clear winner.  Discuss general pattern 
-* `python3`+`jupyter`+`zeromq` is provided by `miniconda`; IHaskell's `pango`+`cairo`+`magic` deps 
-  has been replaced/removed, so macOs have to do nothing and windows users have a chance someday.  
+* `python3`+`jupyter` is provided by `miniconda`; IHaskell's `pango`+`cairo`+`magic` deps 
+  has been replaced/removed.  
 
 
 #### Use by date
