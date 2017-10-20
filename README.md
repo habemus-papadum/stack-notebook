@@ -1,22 +1,37 @@
-# stack-notebook
-_You say `stack ghci`, I say `stack notebook`..._
+# stack-notebook [![Travis](https://travis-ci.org/habemus-papadum/stack-notebook.svg?branch=master)](https://travis-ci.org/habemus-papadum/stack-notebook)
+## _You say `stack ghci`, I say `stack notebook`..._
 
------------------
+## This repo aims to provide a convenient installer/launcher for [IHaskell](https://github.com/gibiansky/IHaskell)
+
 
 ## In theory 
 _Wanna' hack around with Haskell?_
 
 Then try:
-````
-git clone https://github.com/habemus-papadum/stack-notebook
-
-## and then: 
-stack-notebook/stack-notebook
-
-## If you put the script on your path, then you can lose the dash: 
+```bash
+$ git clone https://github.com/habemus-papadum/stack-notebook
+$ stack-notebook/stack-notebook
+```
+If you put the script on your path, then you can lose the dash: 
+```bash
 export PATH=${PWD}/stack-notebook:${PATH}
 stack notebook
-````
+```
+Interacting with an existing stack project is particularly easy:
+```bash
+cd /to/you/stack/project && stack notebook
+```
+Now you can load modules defined in the project into notebooks. 
+
+----------------
+
+The script installs whatever is needed (within reason...) on demand.  
+
+----------------
+
+If you are interested in workflow that combines a literate environment with
+REPL-like interactivity, then while `emacs` might be best in the long run, `stack notebook`
+can get you started with a potentially easier learning curve. 
 
 ## In reality 
 _Well, you know... Very much a WIP._
