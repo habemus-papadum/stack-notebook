@@ -54,7 +54,7 @@ before_install:
       touch ${travis_cache_sentinal_1}
       do_build="false"
     else
-      do_build="false"
+      do_build="true"
     fi
 
 script:
