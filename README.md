@@ -5,34 +5,35 @@ _You say `stack ghci`, I say `stack notebook`..._
 
 This repo aims to provide a convenient installer/launcher for [IHaskell](https://github.com/gibiansky/IHaskell). 
 
-If you are interested in a workflow that combines a literate style with REPL-like interactivity, then, while `emacs` might already be there, `stack notebook` may be worth a look (_or not_, open an issue and let me know, but do understand that all compliments and credits go to the creators of IHaskell).  
+If you are interested in a workflow that combines a literate style with a REPL-like interactivity, then, while `emacs` might already be there, `stack notebook` may be worth a look (or _not_, open an issue and let me know, but do understand that all compliments and credits go to the IHaskell team).  
 
 The script installs whatever is needed (_within reason_) on demand. 
  
 ------------------
 
-## In theory... 
+## In Theory 
 _Wanna' hack around with Haskell?_
 
 Then try:
 ```bash
-$ git clone https://github.com/habemus-papadum/stack-notebook
-$ stack-notebook/stack-notebook
+git clone https://github.com/habemus-papadum/stack-notebook
+stack-notebook/stack-notebook
 ```
 If you put the script on your path, then you can lose the dash: 
 ```bash
-$ export PATH=${PWD}/stack-notebook:${PATH}
-$ stack notebook
+export PATH=${PWD}/stack-notebook:${PATH}
+stack notebook
 ```
 Interacting with an existing stack project is particularly easy:
 ```bash
-$ cd /to/your/stack/project && stack notebook
+cd /to/your/stack/project && stack notebook
 ```
-Now your project code can be used from within your notebooks. 
+Now your project code can be used from within your notebooks.  Have a browse through simple
+example [project](https://github.com/habemus-papadum/stack-notebook/tree/master/test/test-project) with a corresponding simple [notebook](https://github.com/habemus-papadum/stack-notebook/blob/master/test/test-project/TestProjectNotebook.ipynb).    
 
 ----------------
 
-## In reality... 
+## In Reality 
 _Well, you know... Very much a WIP._
 
 ## New to Haskell?
