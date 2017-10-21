@@ -49,7 +49,8 @@ before_install:
     # a full build is too slow.  Rather than flailing around for a sweet spot, I will create a super-trim build for
     # osx that is sans-displays but should still some pickup issues, but rely on the linux build for the deeper testing
     #
-    # Madness begins NOW!
+    # Madness begins NOW!  Note: true || do_build="false" is disable checkpointing on linux, because it does not have as
+    # severe restrictions on travis
   - |
     do_build="true"
     if [ ${do_build} = "true" ]; then
