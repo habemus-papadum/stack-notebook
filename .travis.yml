@@ -7,8 +7,8 @@ cache:
 language: cpp
 matrix:
   include:
-#    - os: linux
-    - os: osx
+    - os: linux
+#    - os: osx
 before_install:
   - echo "Installing stack..."
   - |
@@ -36,13 +36,20 @@ before_install:
       brew install -v zeromq
     fi
   - pkg-config --modversion libzmq
-    # Bootstrap stack cache to work around issues when travis times out a long build.
+    #
+    # Bootstrap stack cache to work around issues when travis times out on a long build (on osx).
     # On an initial build without cache, IHaskell might take too long to build and is killed by travis.
     # But when travis does this, it does not save the cache generated up to that point, which means
     # the same thing will happen if the build is rerun.  So instead we build a few packages, record a sentinel,
-    # and then fail.  While this requires a manual rerun each time a new lts is cut, for now this seems like the only
+    # and then fail the build.  While this requires a manual rerun each time a new lts is cut, for now this seems like the only
     # way forward.  (Note: When this happens, the existing cache should be dropped so that the cache does not accumulate old
     # lts's)
+    #
+    # And it still fails... on osx.  Travis only allows 180s to upload the cache, which is not enough.   And as stated
+    # a full build is too slow.  Rather than flailing around for a sweet spot, I will create a super-trim build for
+    # osx that is sans-displays but should still some pickup issues, but rely on the linux build for the deeper testing
+    #
+    # Madness begins NOW!
   - |
     do_build="true"
     if [ ${do_build} = "true" ]; then
@@ -53,7 +60,7 @@ before_install:
       if [ ! -f "${travis_cache_sentinal}" ]; then
         echo "Checkpointing cache"
         touch ${travis_cache_sentinal}
-        do_build="false"
+        true || do_build="false"
       fi
     fi
   - |
@@ -65,7 +72,7 @@ before_install:
         echo "Bootstrapping aeson"
         stack install aeson
         touch ${travis_cache_sentinal}
-        do_build="false"
+        true || do_build="false"
       fi
     fi
   - |
@@ -78,7 +85,7 @@ before_install:
         stack setup
         stack install diagrams
         touch ${travis_cache_sentinal}
-        do_build="false"
+        true || do_build="false"
       fi
     fi
 
