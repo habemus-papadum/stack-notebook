@@ -37,7 +37,7 @@ example [project](https://github.com/habemus-papadum/stack-notebook/tree/master/
 _Well, you know... Very much a WIP._
 
 ## New to Haskell?
-Truth be told, this script may not be for you. This is more of an exploration of how I wish the notebook process could work someday.  And even though it does seem to be getting robust enough on my boxes and Travis, I wouldn't be surprised if it fails miserably on yours, or suddenly stops working every few months.  One could easily fall down the rabbit hole trying to track down fixes if you are new to stack, jupyter, conda, {I}Haskell, cabal, etc.  But, if you do end up giving it a shot, whether you have :+1: or :-1: experience, feel free to open an issue and let me know how it went. 
+Truth be told, this script may not be for you. This is more of an exploration of how I wish the notebook process could work someday.  And even though it does seem to be getting robust enough on my boxes and Travis, I wouldn't be surprised if it fails miserably on yours, or suddenly stops working every few months.  One could easily fall down the rabbit hole trying to track down fixes if you are new to stack, jupyter, conda, {I}Haskell, cabal, etc.  But, if you do end up giving it a shot, whether you have :+1: or :-1: experience, feel free to open an issue and let me know how it went.  I can't promise to help fix your problems, but I will apologize if `stack notebook` ruins your day.  
 
 ## Caveats
 * While IHaskell is quite nice, it might not be mature enough to convince you to abandon you tried and true tools.  This script is a baby step towards better user experience, but it is in no way a complete solution.  It may be a step backwards...  
@@ -58,7 +58,7 @@ Truth be told, this script may not be for you. This is more of an exploration of
 * Do scan through the script if you want to know more details.   
 
 ## Advanced usage
-`stack notebook` just executes whatever is piped into `STDIN`.  A plain `stack notebook` invocation is equivalent to `echo "jupyter notebook" | stack notebook`.  This can be used to render notebooks, list and  delete kernels, and so forth.  See the `.travis.yml` for ideas.    
+`stack notebook` just executes whatever is piped into `STDIN`.  A plain `stack notebook` invocation is equivalent to `echo "jupyter notebook" | stack notebook`.  This can be used to render notebooks, list and delete kernels, and so forth.  See the `.travis.yml` for ideas.    
 
 #### Use by date
 As I write this, it is Oct. 15, 2017 -- If you are still relying on the repo 3-4 months from now,
