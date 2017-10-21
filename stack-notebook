@@ -122,7 +122,10 @@ EOM
         git clone https://github.com/habemus-papadum/IHaskell.git
         commitish="stack-notebook/${snapshot}"  ## is it really a commitish?
         cd IHaskell
-        if git rev-parse --verify remotes/origin/${commitish}; then
+        if git rev-parse --verify ${commitish}; then
+            echo "Checking out ${commitish}"
+            git checkout ${commitish}
+        elif git rev-parse --verify remotes/origin/${commitish}; then
             echo "Checking out ${commitish}"
             git checkout -b ${commitish} remotes/origin/${commitish}
         else
