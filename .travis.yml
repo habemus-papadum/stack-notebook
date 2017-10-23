@@ -56,8 +56,7 @@ before_install:
     if [ ! -f "${travis_cache_sentinel}" ]; then
       echo "Cache Sentinel not found"
       set -e
-      stack install aeson
-      stack install diagrams
+      stack install aeson $RESOLVER
       touch ${travis_cache_sentinel}
       echo "Checkpointing cache on first pass -- Purposely failing build!!!"
       export do_build="false"
