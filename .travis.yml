@@ -49,7 +49,7 @@ before_install:
   ## This means each new item in the build matrix _will_ fail on first build.
   ## Note on osx, the cache is so big, and the bandwidth so limited, that the cache upload process gets timed out.
   - |
-    do_build="true"
+    export do_build="true"
     stack setup $RESOLVER
     travis_cache_sentinel="$(stack  path --snapshot-install-root)/travis_cache_sentinel_1"
     echo ${travis_cache_sentinel}
@@ -60,24 +60,9 @@ before_install:
       stack install diagrams
       touch ${travis_cache_sentinel}
       echo "Checkpointing cache on first pass -- Purposely failing build!!!"
-      do_build="false"
+      export do_build="false"
       set +e
     fi
 
-script:
-  - ${do_build} || exit 1
-  - export PATH=$PWD:$PATH
-  - export STACK_NB_DIR=$PWD
-# test within global project
-  - echo "echo Check Installation successful" | stack notebook
-  - kernel=$(echo 'echo $STACK_NOTEBOOK_KERNEL' | stack notebook) && echo ${kernel}
-  - echo "jupyter nbconvert --ExecutePreprocessor.kernel_name=${kernel} --to notebook --execute --stdout ${STACK_NB_DIR}/test/DisplayTest.ipynb" | stack notebook > test.ipynb
-  - diff test.ipynb ${STACK_NB_DIR}/test/DisplayTest.ipynb
-# test within a specific project
-  - stack new test_proj $RESOLVER
-  - cd test_proj
-  - echo "echo Check Installation successful" | stack notebook
-  - kernel=$(echo 'echo $STACK_NOTEBOOK_KERNEL' | stack notebook) && echo ${kernel}
-  - echo "jupyter nbconvert --ExecutePreprocessor.kernel_name=${kernel} --to notebook --execute --stdout ${STACK_NB_DIR}/test/DisplayTest.ipynb" | stack notebook > test.ipynb
-  - diff test.ipynb ${STACK_NB_DIR}/test/DisplayTest.ipynb
+script: test/travis.sh
 
