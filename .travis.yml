@@ -36,63 +36,13 @@ before_install:
       brew install -v zeromq
     fi
   - pkg-config --modversion libzmq
-    #
-    # Bootstrap stack cache to work around issues when travis times out on a long build (on osx).
-    # On an initial build without cache, IHaskell might take too long to build and is killed by travis.
-    # But when travis does this, it does not save the cache generated up to that point, which means
-    # the same thing will happen if the build is rerun.  So instead we build a few packages, record a sentinel,
-    # and then fail the build.  While this requires a manual rerun each time a new lts is cut, for now this seems like the only
-    # way forward.  (Note: When this happens, the existing cache should be dropped so that the cache does not accumulate old
-    # lts's)
-    #
-    # And it still fails... on osx.  Travis only allows 180s to upload the cache, which is not enough.   And as stated
-    # a full build is too slow.  Rather than flailing around for a sweet spot, I will create a super-trim build for
-    # osx that is sans-displays but should still some pickup issues, but rely on the linux build for the deeper testing
-    #
-    # Madness begins NOW!  Note: true || do_build="false" is disable checkpointing on linux, because it does not have as
-    # severe restrictions on travis
-  - |
-    do_build="true"
-    if [ ${do_build} = "true" ]; then
-      stack setup  ## msut do this so paths are readable, will build ghc
-      travis_cache_sentinal="$(stack  path --snapshot-install-root)/travis_cache_sentinal_1"
-      echo ${travis_cache_sentinal}
-      ls ${travis_cache_sentinal}
-      if [ ! -f "${travis_cache_sentinal}" ]; then
-        echo "Checkpointing cache"
-        touch ${travis_cache_sentinal}
-        true || do_build="false"
-      fi
-    fi
-  - |
-    if [ ${do_build} = "true" ]; then
-      travis_cache_sentinal="$(stack  path --snapshot-install-root)/travis_cache_sentinal_2"
-      echo ${travis_cache_sentinal}
-      ls ${travis_cache_sentinal}
-      if [ ! -f "${travis_cache_sentinal}" ]; then
-        echo "Bootstrapping aeson"
-        stack install aeson
-        touch ${travis_cache_sentinal}
-        true || do_build="false"
-      fi
-    fi
-  - |
-    if [ ${do_build} = "true" ]; then
-      travis_cache_sentinal="$(stack  path --snapshot-install-root)/travis_cache_sentinal_3"
-      echo ${travis_cache_sentinal}
-      ls ${travis_cache_sentinal}
-      if [ ! -f "${travis_cache_sentinal}" ]; then
-        echo "Bootstrapping diagrams"
-        stack setup
-        stack install diagrams
-        touch ${travis_cache_sentinal}
-        true || do_build="false"
-      fi
-    fi
+  - stack setup
 
 script:
   - export PATH=$PWD:$PATH
-  - ${do_build} && echo "echo Installation successful" | stack notebook
-  - ${do_build} && kernel=$(echo 'echo $STACK_NOTEBOOK_KERNEL' | stack notebook) && echo ${kernel}
-  - ${do_build} && echo "jupyter nbconvert --ExecutePreprocessor.kernel_name=${kernel} --to notebook --execute --stdout test/DisplayTest.ipynb" | stack notebook > test.ipynb
-  - ${do_build} && diff test.ipynb test/DisplayTest.ipynb
+  - export STACK_NB_DIR=$PWD
+  - echo "echo Check Installation successful" | stack notebook
+  - kernel=$(echo 'echo $STACK_NOTEBOOK_KERNEL' | stack notebook) && echo ${kernel}
+  - echo "jupyter nbconvert --ExecutePreprocessor.kernel_name=${kernel} --to notebook --execute --stdout ${STACK_NB_DIR}/test/DisplayTest.ipynb" | stack notebook > test.ipynb
+  - diff test.ipynb "{STACK_NB_DIR}/test/DisplayTest.ipynb
+## todo test lts-{9.9,9.10,nightly-2017-10-11}

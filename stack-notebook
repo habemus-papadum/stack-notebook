@@ -25,6 +25,36 @@ EOM
   exit 1
 fi
 
+
+## bashism: check if stack exists
+if ! hash pkg-config 2>/dev/null; then
+  less <<- EOM
+There's a problem...
+
+The pkg-config' tool does not appear to be available!
+
+'pkg-config' is a low level tool used for managing software libraries.
+
+In many OS's/Linux distributions, 'pkg-config' is usually bundled with many other low level tools via
+a "basic development tools" mega-package.  While this script only directly relies on pkg-config,
+the GHC Haskell compiler will rely on a much larger number of these typical tools.  While getting these
+tools is pretty simple (hopefully, a few minutes of googling around), it involves making some decisions that
+I do not feel comfortable making for you.  Please install 'pkg-config' (and the other basic tools needed by ghc)
+and try running 'stack notebook' again.
+
+
+On macOs with homebrew, this might be sufficient:
+# first install "xcode commandline tools" (google for this, or just try running 'gcc' in the terminal,
+# and you will be prompted for what to do)
+
+#then
+brew install pkg-config
+
+EOM
+  exit 1
+fi
+
+
 report() {
     if [ -t 0 ]; then echo $1; fi
 }
@@ -87,7 +117,7 @@ if [ ! -d "${ihaskell_dir}" ]; then
 There's a problem...
 
 The library zeromq v4.x does not appear to be installed on your system.  I'm very sorry, but this
-the one issue I'm not sure how to solve.
+the one slightly complicated issue I'm not sure how to solve.
 
 Zeromq4 is widely available, and installation can often be as easy as:
 
@@ -123,15 +153,22 @@ EOM
         git clone https://github.com/habemus-papadum/IHaskell.git
         commitish="stack-notebook/${snapshot}"  ## is it really a commitish?
         cd IHaskell
-        if git rev-parse --verify ${commitish}; then
-            echo "Checking out ${commitish}"
-            git checkout ${commitish}
-        elif git rev-parse --verify remotes/origin/${commitish}; then
+
+        ## first check if there is branch for the applicable snapshot
+        ## (This is where support for old lts's go when it is no longer feasible manage
+        ## patches for them in the main branch)
+        if git rev-parse --verify remotes/origin/${commitish}; then
             echo "Checking out ${commitish}"
             git checkout -b ${commitish} remotes/origin/${commitish}
+
+        ## Then see if there is a applicable stack.yaml in the main branch
+        elif [ -f "stack-${snapshot}.yaml" ]; then
+            echo "Found stack-${snapshot}.yaml..."
+            rm stack.yaml
+            ln -s stack-${snapshot}.yaml stack.yaml
         else
             echo "There is no tag/branch for ${commitish} in the IHaskell repo"
-            echo "We will try to use the master branch.  Cross you fingers."
+            echo "We will try to use the default 'stack.yaml'.  Cross your fingers...."
             sleep 3s
         fi
     )
