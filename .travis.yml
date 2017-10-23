@@ -5,10 +5,16 @@ cache:
   - $HOME/zeromq4-x
 
 language: cpp
-matrix:
-  include:
-    - os: linux
-#    - os: osx
+
+# TODO: osx takes too long to build initial cache
+os:
+  - linux
+env:
+  - RESOLVER="--resolver=lts-9.9"
+  - RESOLVER="--resolver=lts-9.10"
+  - RESOLVER="--resolver=lts-nightly-2017-10-11"
+  - RESOLVER=""
+
 before_install:
   - echo "Installing stack..."
   - |
@@ -36,13 +42,21 @@ before_install:
       brew install -v zeromq
     fi
   - pkg-config --modversion libzmq
-  - stack setup
+  - stack setup $RESOLVER
 
 script:
   - export PATH=$PWD:$PATH
   - export STACK_NB_DIR=$PWD
+# test within global project
   - echo "echo Check Installation successful" | stack notebook
   - kernel=$(echo 'echo $STACK_NOTEBOOK_KERNEL' | stack notebook) && echo ${kernel}
   - echo "jupyter nbconvert --ExecutePreprocessor.kernel_name=${kernel} --to notebook --execute --stdout ${STACK_NB_DIR}/test/DisplayTest.ipynb" | stack notebook > test.ipynb
-  - diff test.ipynb "${STACK_NB_DIR}/test/DisplayTest.ipynb
-## todo test lts-{9.9,9.10,nightly-2017-10-11}
+  - diff test.ipynb ${STACK_NB_DIR}/test/DisplayTest.ipynb
+# test within a specific project
+  - stack new test_proj $RESOLVER
+  - cd test_proj
+  - echo "echo Check Installation successful" | stack notebook
+  - kernel=$(echo 'echo $STACK_NOTEBOOK_KERNEL' | stack notebook) && echo ${kernel}
+  - echo "jupyter nbconvert --ExecutePreprocessor.kernel_name=${kernel} --to notebook --execute --stdout ${STACK_NB_DIR}/test/DisplayTest.ipynb" | stack notebook > test.ipynb
+  - diff test.ipynb ${STACK_NB_DIR}/test/DisplayTest.ipynb
+
