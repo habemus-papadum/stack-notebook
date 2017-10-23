@@ -53,8 +53,8 @@ before_install:
     stack setup $RESOLVER
     travis_cache_sentinel="$(stack  path --snapshot-install-root)/travis_cache_sentinel_1"
     echo ${travis_cache_sentinel}
-    ls ${travis_cache_sentinel}
     if [ ! -f "${travis_cache_sentinel}" ]; then
+      echo "Cache Sentinel not found"
       set -e
       stack install aeson
       stack install diagrams
@@ -65,7 +65,7 @@ before_install:
     fi
 
 script:
-  - ${do_build} || travis_terminate 1
+  - ${do_build} || exit 1
   - export PATH=$PWD:$PATH
   - export STACK_NB_DIR=$PWD
 # test within global project
