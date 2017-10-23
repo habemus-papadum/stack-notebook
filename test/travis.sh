@@ -25,6 +25,6 @@ do_test_suite() {
 do_test_suite
 
 # test within a specific project
-stack new test_proj $RESOLVER
-cd test_proj
+stack new test-proj $RESOLVER
+cd test-proj
 do_test_suite
