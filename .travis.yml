@@ -12,7 +12,7 @@ os:
 env:
   - RESOLVER="--resolver=lts-9.9"
   - RESOLVER="--resolver=lts-9.10"
-  - RESOLVER="--resolver=lts-nightly-2017-10-11"
+  - RESOLVER="--resolver=nightly-2017-10-11"
   - RESOLVER=""
 
 before_install:
@@ -42,9 +42,30 @@ before_install:
       brew install -v zeromq
     fi
   - pkg-config --modversion libzmq
-  - stack setup $RESOLVER
+
+  ## Until IHaskell goes on a bigger diet, we need this nonsense
+  ## A clean build gets timed out by travis
+  ## So for now we install a few packages and fail the build in a way that the cache gets committed
+  ## This means each new item in the build matrix _will_ fail on first build.
+  ## Note on osx, the cache is so big, and the bandwidth so limited, that the cache upload process gets timed out.
+  - |
+    do_build="true"
+    stack setup $RESOLVER
+    travis_cache_sentinel="$(stack  path --snapshot-install-root)/travis_cache_sentinel_1"
+    echo ${travis_cache_sentinel}
+    ls ${travis_cache_sentinel}
+    if [ ! -f "${travis_cache_sentinel}" ]; then
+      set -e
+      stack install aeson
+      stack install diagrams
+      touch ${travis_cache_sentinel}
+      echo "Checkpointing cache on first pass -- Purposely failing build!!!"
+      do_build="false"
+      set +e
+    fi
 
 script:
+  - ${do_build} || travis_terminate 1
   - export PATH=$PWD:$PATH
   - export STACK_NB_DIR=$PWD
 # test within global project
