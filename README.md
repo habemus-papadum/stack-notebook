@@ -3,10 +3,10 @@ _You say `stack ghci`, I say `stack notebook`..._
 
 ##
 
-This repo aims to provide a convenient installer/launcher for [IHaskell](https://github.com/gibiansky/IHaskell) notebooks. 
+This repo aims to provide a convenient installer/launcher for [IHaskell](https://github.com/gibiansky/IHaskell) notebooks using the [Haskell Stack Tool](https://docs.haskellstack.org/en/stable/README/). 
 ##
 
-If you are interested in a workflow that combines a literate style with REPL-like interactivity, then, `stack notebook` might be worth a look (or _not_, open an issue and let me know, but do understand that all compliments and credits go to the IHaskell team).
+If you are interested in a workflow consisting of the literate style and REPL-like interactivity offered by IHaskell notebooks, then, `stack notebook` might help get you started with a minimum of fuss (or _not_, open an [issue](https://github.com/habemus-papadum/stack-notebook/issues) and let me know, but do understand that all compliments and credits go to the IHaskell team).
 
 ## 
 
@@ -25,7 +25,7 @@ Put the script on your path, and you can lose the dash:
 export PATH=${PWD}/stack-notebook:${PATH}
 stack notebook
 ```
-Interacting with an existing stack project is particularly easy:
+Interacting with an existing `stack` project is particularly easy:
 ```bash
 cd /to/your/stack/project && stack notebook
 ```
@@ -41,13 +41,13 @@ Now you can tinker around with your code using IHaskell notebooks.  Have a brows
 _Well, you know... Very much a WIP._
 
 ## Hints
-* You have many options for making changes to your project code visible to your notebook, including several workflows that might be familiar from `ghci`.  One method that you might find useful is:
-  * rebuild the project: `stack build `, perhaps with `--fast` or `--file-watch`
-  * Perform the `Kernel`->`Restart & Run All` menu action (which can be assigned a keyboard shortcut).
+* `stack notebook` tries to make it easy to create notebooks that can use code from a local `stack` project.  You will inevitably want to make changes to your project code visible to your running notebooks.  One method would be to:
+  * At the terminal, rebuild the project: `stack build `, perhaps with `--fast` or `--file-watch`
+  * In the notebook, perform the `Kernel`->`Restart & Run All` menu action (which can be assigned a keyboard shortcut).
    
   While this can be overkill and a little inelegant, it is a useful, safe starting point from which you can then optimize.
 * Teach your OS to provide [quicklooks](https://github.com/tuxu/nbviewer-app) for `jupyter` notebooks.  
-* Squeal with that delight that web based scm providers will render notebooks on demand.  Teachers can just `git push` notebooks.      
+* Squeal with that delight that web based scm providers will render notebooks on demand.  Teachers can just `git push` notebooks.  Cry in anguish when you try to diff notebooks... 
 * The jupyter notebook interface has been designed to be easily usable without having to read the manual.  However, it can be useful to open a notebook and take the interface tour from the `Help` menu to get started.    
 
 ## New to Haskell?
@@ -56,30 +56,29 @@ Truth be told, this script may not be for you. This is more of an exploration of
 ## Caveats
 * While `IHaskell` is quite nice, it might not be mature enough to convince you to abandon your tried and true tools.  This script is a baby step towards better initial user experience, but it is in no way a complete solution.  It may be a step backwards...  
 * If you've never used `stack` on your box before, you will want to go get lunch while everything is installing. "Time to first notebook" can be around 45 minutes!  But, after that, launches for any project on the same `lts` should take about 3 seconds.  Every time you switch to a new `lts`, `IHaskell` is rebuilt, taking at least 5 minutes, but up to the full 45 minutes depending on how well you have exercised the new `lts`. (These timings are for `travis`-like machines.)  
-* `IHaskell` is provided by a downstream [fork](https://github.com/habemus-papadum/IHaskell).  The fork and this repo are meant to be short lived.  
+* `IHaskell` is provided by a downstream [fork](https://github.com/habemus-papadum/IHaskell).  The fork and this script are meant to be transient.  Upstreamers, please consider forking/rewriting `stack-notebook` in Haskell and and making it your own by having it point back at your repo.  Users beware that notebooks written against the fork, may or may not work against upstream.   
 * Only Linux and macOs are supported.  The upstream `IHaskell` has never supported Windows, and while my fork takes some small steps to make it more feasible, I don't really know how hard it would be to get it all the way to the finish line.  
 * The provided `IHaskell` may not build with old `lts` snapshots -- it should be easy to resolve this by bisecting old versions of `IHaskell` but that is not in the scope of this exploration.
-* Only really tested on `lts-9.9`
-* In the long run, you might find 'emacs+literate haskell' more productive and powerful.  
-* `stack-notebook` could have been split into two: `stack-notebook-install-prereqs-as-needed-and-setup-kernel-for-project`  and `stack-notebook-run-notebook-server-for-all-kernels`.  I like jsut having one thing to think about.  However, be aware you might experience cognitive dissonance when you notice that even though you launched a notebook server for `projectA`, kernels from other projects are safely usable (they run with the correct environment variables set), but this can be fairly useful.    
-* To allow for `rm -rf` uninstall, kernelspecs a placed in the bundled jupyter's `sys.prefix`: `~/.stack-notebook/conda/share/jupyter/kernels`.  This may hinder usability with things like Atom Hydrogen (not sure). 
+* Only really tested on `lts-9.9`, `lts-9.10`, `nightly-2017-10-17`
+* In the long run, you might find 'emacs(org, intero)+literate haskell' more productive and powerful.  
+* `stack-notebook` could have been split into two: `stack-notebook-install-prereqs-as-needed-and-setup-kernel-for-project`  and `stack-notebook-run-notebook-server-for-all-kernels`.  I like just having to think about only one thing.  However, be aware you might experience cognitive dissonance when you notice that even though you launched a notebook server for `projectA`, kernels from other projects are safely usable (they run with the correct environment variables set), but this can be fairly useful.    
+* To allow for `rm -rf` uninstall, kernelspecs a placed in `~/.stack-notebook/conda/share/jupyter/kernels`.  This may hinder usability with things like Atom Hydrogen (not sure). 
 * A thousand of other things buried in the nooks and crannies of my feeble mind. 
 
 
 ## Theory of Operation
-* `IHaskell` is built once, on demand, per `lts` snapshot -- they live in
+* `IHaskell` is built once, on demand, per `lts` snapshot -- builds live in
  `~/.stack_notebook/<snapshot>/IHaskell`
-* When running `stack notebook` for a `stack` `projectA`,  the path to the `pkg-db` of the `IHaskell` matching the project's `lts` is interposed into the second position of projectA's normal `GHC_PACKAGE_PATH`  before launching kernels (so there are 4 directories instead of the `stack` norm of 3). Depending on the internals of `IHaskell`, this may not be necessary, but given that `IHaskell` is "lts pure", this should be safe.  Something similar is done for HASKEKK_PACKAGE_SANDBOXES.  I've no idea if that is necessary.    
-* There is one jupyter kernel created for each `stack`+`lts` pair (a `jupyter` kernel is basically just a json file and takes no time to create). 
-* `python3`+`jupyter` is provided by `miniconda`. Users must BYO[ZMQ](http://zeromq.org), but the script tries to break it to them gently. IHaskell's `pango`+`cairo`+`gtk`+ `libmagic` deps has been replaced/removed.
+* When running `stack notebook` for a `stack` `projectA`,  the path to the `pkg-db` of the `IHaskell` matching the project's `lts` is interposed into the second position of projectA's normal `GHC_PACKAGE_PATH`  before launching kernels (so there are 4 directories instead of the `stack` norm of 3). Depending on the internals of `IHaskell`, this may not be necessary, but given that `IHaskell` is "lts pure", this should be safe.  Something similar is done for `HASKELL_PACKAGE_SANDBOXES`.  I've no idea if that is necessary.    
+* There is one jupyter kernel created for each `stack` project +`lts` pair (a `jupyter` kernel is basically just a json file and takes no time to create). 
+* `python3`+`jupyter` is provided by `miniconda`. Users must BYO[ZMQ](http://zeromq.org), but the script tries to break it to them gently. Upstream IHaskell's `pango`+`cairo`+`gtk`+ `libmagic` deps has been replaced/removed.
 * Do scan through the script if you want to know more details.   
 
 ## Advanced usage
-`stack notebook` just executes whatever is piped into `STDIN`.  A plain `stack notebook` invocation is equivalent to `echo "jupyter notebook" | stack notebook`.  This can be used to render notebooks, list and delete kernels, allow remote connections, and so forth.  See the `.travis.yml` for ideas.    
+`stack notebook` just executes whatever is piped into `STDIN`.  A plain `stack notebook` invocation is equivalent to `echo "jupyter notebook" | stack notebook`.  This can be used to render notebooks, list and delete kernels, allow connections from remote boxes, and so forth.  See the `.travis.yml` for ideas.    
 
 #### Use by date
-As I write this, it is Oct. 15, 2017 -- If you are still relying on the repo 3-4 months from now,
-you are asking for trouble...
+As I write this, it is Oct. 15, 2017 -- If you are still relying on the repo 3-4 months from now, you are asking for trouble...
 
 #### TODO 
 * Chart not working
@@ -87,9 +86,9 @@ you are asking for trouble...
 
 #### Nice possibilities that probably won't happen
 * Allow user to choose a slimmer version of IHaskell lacking bundled displays (don't know how to do this without adding complexity to the script)
-* Get ihaskell-display's into stackage (not the full beast, just integration shims for other projects)
+* Get ihaskell-display  into stackage (not the full IHaskell beast, just integration shims needed for other projects)
 * Allow notebooks to include other notebooks cf. NBInclude.jl.  Useful for notebooks which are meant for teaching.
-* Allow cells to have tags + more complicated annotations.  Notebook-include, nbconvert to .hs, etc should allow filtering by tag.
+* Allow cells to have tags + more complicated annotations.  Notebook-include, nbconvert to .hs, etc should allow filtering by tag.  (Notebook 5.0 supports cell tagging)
 * Split modules across cells.  Annotate a cell's Module.  
 * Long term: Make notebooks a first class citizen within ghc.  Ideally ghc provides an abstraction layer so that tools like
   hoogle, hindent, etc can be used on a first class haskell source file (.hs, .lhs, .ihsnb, etc) without having to know the details of each format.     
