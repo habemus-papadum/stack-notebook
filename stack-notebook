@@ -54,6 +54,7 @@ EOM
   exit 1
 fi
 
+## add check for curl....
 
 report() {
     if [ -t 0 ]; then echo $1; fi
@@ -69,13 +70,13 @@ snapshot=$(basename "$(dirname "$(stack path --snapshot-install-root)")")
 report "Using stack snapshot ${snapshot}..."
 
 notebook_dir=${HOME}/.stack-notebook
-
+mkdir -p ${notebook_dir}
 ##conda
 conda_dir=${notebook_dir}/conda
 conda=${conda_dir}/bin/conda
 if [ ! -d "${conda_dir}" ]; then
 (
-  cd ${nb_snapshot_dir}
+  cd ${notebook_dir}
   echo "Installing miniconda..."
   if [ `uname` = "Linux" ]; then
      conda_os=Linux
@@ -104,7 +105,13 @@ nb_snapshot_dir=${notebook_dir}/snapshots/${snapshot}
 mkdir -p ${nb_snapshot_dir}
 
 ihaskell_dir=${nb_snapshot_dir}/IHaskell
-if [ ! -d "${ihaskell_dir}" ]; then
+if [ ! -z "${IHASKELL_DEV_MODE}" ]; then
+    report "IHaskell Dev mode..."
+    ihaskell_dir="${ihaskell_dir}${IHASKELL_DEV_MODE}"
+    if [ ! -L ${ihaskell_dir} ]; then
+        echo "${ihaskell_dir} should be a symlink.  Exiting..." && exit 1
+    fi
+elif [ ! -d "${ihaskell_dir}" ]; then
 
     ## check if zeromq exists
     echo "Ensuring zeromq 4.0 has been installed..."
@@ -174,23 +181,21 @@ EOM
     )
 fi
 
-ihaskell=${nb_snapshot_dir}/bin/ihaskell
+ihaskell_install_dir="$(cd ${ihaskell_dir}; stack path --local-install-root)/bin"
+ihaskell=${ihaskell_install_dir}/ihaskell
 if [ ! -f "${ihaskell}" ]; then
 (
-  ## build
-  cd ${nb_snapshot_dir}
-  mkdir -p bin
+  report "Building IHaskell..."
+  mkdir -p ${ihaskell_install_dir}
   cd ${ihaskell_dir}
-
-  # Path altered to suppress warning from stack
-  PATH=${nb_snapshot_dir}/bin:${PATH} ${stack} install --resolver=${snapshot} --local-bin-path=${nb_snapshot_dir}/bin --fast
+  ${stack} build --resolver=${snapshot} --fast  ## todo: consider not fast
 )
 fi
 
 # kernel spec
 kernels_dir=${conda_dir}/share/jupyter/kernels
-kernel="${project}-${snapshot}"
-if [ ! -z "${STACK_NOTEBOOK_KERNEL_NAME}" ]; then
+kernel="${project}-${snapshot}${IHASKELL_DEV_MODE}"
+if [ ! -z "${STqACK_NOTEBOOK_KERNEL_NAME}" ]; then
   kernel=${STACK_NOTEBOOK_KERNEL_NAME}
 fi
 
@@ -290,8 +295,6 @@ exit 1
 fi
 
 ## Runtime
-export PATH=${conda_dir}/bin:${nb_snapshot_dir}/bin:${PATH}
-export STACK_NOTEBOOK_KERNEL=${kernel}
 
 if [ -t 0 ]; then # stdin is a pipe
     cmd="${jupyter} notebook"
@@ -299,5 +302,8 @@ else
    cmd=$(</dev/stdin)
 fi
 stack exec bash << EOM
+export PATH=${conda_dir}/bin:${ihaskell_install_dir}:\${PATH}
+export STACK_NOTEBOOK_KERNEL=${kernel}
+
 ${cmd}
 EOM
