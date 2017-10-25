@@ -12,8 +12,7 @@ os:
 env:
   - RESOLVER="--resolver=lts-9.9"
   - RESOLVER="--resolver=lts-9.10"
-#  Travis is out of mem'ing on nightly build -- arg, travis, arg, ghc
-#  - RESOLVER="--resolver=nightly-2017-10-11"
+  - RESOLVER="--resolver=nightly-2017-10-11"
   - RESOLVER=""
 
 before_install:
