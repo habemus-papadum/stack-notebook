@@ -80,9 +80,6 @@ Truth be told, this script may not be for you. This is more of an exploration of
 #### Use by date
 As I write this, it is Oct. 15, 2017 -- If you are still relying on the repo 3-4 months from now, you are asking for trouble...
 
-#### TODO 
-* Chart not working
-* Prefer SVG for display; address resizing issues if they still exist
 
 #### Nice possibilities that probably won't happen
 * Allow user to choose a slimmer version of IHaskell lacking bundled displays (don't know how to do this without adding complexity to the script)

@@ -94,7 +94,7 @@ fi
 jupyter=${notebook_dir}/conda/bin/jupyter
 if [ ! -f "${jupyter}" ]; then
 (
-  ${conda} install --yes jupyter_core notebook nbconvert ipykernel ipywidgets
+  ${conda} install --yes jupyter_core=4.3 notebook=5.0 nbconvert=5.2 ipykernel=4.6 ipywidgets=6.0 widgetsnbextension=2.0
 )
 fi
 
@@ -195,7 +195,7 @@ fi
 # kernel spec
 kernels_dir=${conda_dir}/share/jupyter/kernels
 kernel="${project}-${snapshot}${IHASKELL_DEV_MODE}"
-if [ ! -z "${STqACK_NOTEBOOK_KERNEL_NAME}" ]; then
+if [ ! -z "${STACK_NOTEBOOK_KERNEL_NAME}" ]; then
   kernel=${STACK_NOTEBOOK_KERNEL_NAME}
 fi
 
