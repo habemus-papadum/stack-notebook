@@ -20,4 +20,5 @@ cabal.project.local
 .HTF/
 .ipynb_checkpoints
 Untitled.ipynb
-test.ipynb
+temp
+tmp

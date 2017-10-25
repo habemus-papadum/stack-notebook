@@ -14,7 +14,8 @@ env:
   - RESOLVER="--resolver=lts-9.10"
 #  Travis is out of mem'ing on nightly build -- arrrg, travis, arrrrrg, ghc
 #  - RESOLVER="--resolver=nightly-2017-10-11"
-  - RESOLVER=""
+# This works locally but times out on travis,  -- arrrg, travis
+#  - RESOLVER=""
 
 before_install:
   - echo "Installing stack..."
