@@ -3,7 +3,7 @@ set -e
 
 ## NOTE:  This script is being put into "maintenance mode."  As it stands, the complexity is just about at the limits
 ## of what I can tolerate for a single bash script.  I don't plan to add more features, but will likely make tweaks to
-## improve robustness. -- nehal, 10/25/17 
+## improve robustness. -- nehal, 10/25/17
 
 stack=${STACK_EXE:-stack}
 ## bashism: check if stack exists
