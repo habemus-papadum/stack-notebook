@@ -188,7 +188,7 @@ if [ ! -f "${ihaskell}" ]; then
   report "Building IHaskell..."
   mkdir -p ${ihaskell_install_dir}
   cd ${ihaskell_dir}
-  ${stack} build --resolver=${snapshot}
+  ${stack} build --resolver=${snapshot} --fast  ## todo: consider not fast
 )
 fi
 
