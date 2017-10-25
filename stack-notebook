@@ -181,7 +181,7 @@ EOM
     )
 fi
 
-ihaskell_install_dir="$(cd ${ihaskell_dir}; stack path --local-install-root)/bin"
+ihaskell_install_dir="$(cd ${ihaskell_dir}; stack path --resolver=${snapshot} --local-install-root)/bin"
 ihaskell=${ihaskell_install_dir}/ihaskell
 if [ ! -f "${ihaskell}" ]; then
 (
