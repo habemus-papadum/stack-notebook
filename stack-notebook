@@ -58,20 +58,16 @@ EOM
   exit 1
 fi
 
-## add check for curl....
-
-report() {
-    if [ -t 0 ]; then echo $1; fi
-}
+## TODO add check for curl....
 
 ## Installs ghc if need
 project_root=$(${stack} --install-ghc path --project-root)
-report "Running stack notebook for ${project_root}..."
+>&2 echo "Running stack notebook for ${project_root}..."
 project=$(basename ${project_root})
 
 #todo: get snapshot via `${stack} config get` when available
 snapshot=$(basename "$(dirname "$(stack path --snapshot-install-root)")")
-report "Using stack snapshot ${snapshot}..."
+>&2 echo "Using stack snapshot ${snapshot}..."
 
 notebook_dir=${HOME}/.stack-notebook
 mkdir -p ${notebook_dir}
@@ -81,13 +77,13 @@ conda=${conda_dir}/bin/conda
 if [ ! -d "${conda_dir}" ]; then
 (
   cd ${notebook_dir}
-  echo "Installing miniconda..."
+  >&2 echo "Installing miniconda..."
   if [ `uname` = "Linux" ]; then
      conda_os=Linux
   elif [ `uname` = "Darwin" ]; then
      conda_os=MacOSX
   elif [ `uname` = "Darwin" ]; then
-     echo "stack-notebook does not support the $(uname) platform" && exit 1
+     >&2 echo "stack-notebook does not support the $(uname) platform" && exit 1
   fi
   curl -O https://repo.continuum.io/miniconda/Miniconda3-latest-${conda_os}-x86_64.sh
   sh Miniconda3-latest-${conda_os}-x86_64.sh -b -f -p ${conda_dir}
@@ -110,15 +106,15 @@ mkdir -p ${nb_snapshot_dir}
 
 ihaskell_dir=${nb_snapshot_dir}/IHaskell
 if [ ! -z "${IHASKELL_DEV_MODE}" ]; then
-    report "IHaskell Dev mode..."
+    >&2 echo "IHaskell Dev mode..."
     ihaskell_dir="${ihaskell_dir}${IHASKELL_DEV_MODE}"
     if [ ! -L ${ihaskell_dir} ]; then
-        echo "${ihaskell_dir} should be a symlink.  Exiting..." && exit 1
+        >&2 echo "${ihaskell_dir} should be a symlink.  Exiting..." && exit 1
     fi
 elif [ ! -d "${ihaskell_dir}" ]; then
 
     ## check if zeromq exists
-    echo "Ensuring zeromq 4.0 has been installed..."
+    >&2 echo "Ensuring zeromq 4.0 has been installed..."
     set +e
     pkg-config --atleast-version=4.0.0 libzmq && pkg-config --max-version=5.0.0 libzmq
     zmq_ok=$?
@@ -169,17 +165,17 @@ EOM
         ## (This is where support for old lts's go when it is no longer feasible manage
         ## patches for them in the main branch)
         if git rev-parse --verify remotes/origin/${commitish}; then
-            echo "Checking out ${commitish}"
+            >&2 echo "Checking out ${commitish}"
             git checkout -b ${commitish} remotes/origin/${commitish}
 
         ## Then see if there is a applicable stack.yaml in the main branch
         elif [ -f "stack-${snapshot}.yaml" ]; then
-            echo "Found stack-${snapshot}.yaml..."
+            >&2 echo "Found stack-${snapshot}.yaml..."
             rm stack.yaml
             ln -s stack-${snapshot}.yaml stack.yaml
         else
-            echo "There is no tag/branch for ${commitish} in the IHaskell repo"
-            echo "We will try to use the default 'stack.yaml'.  Cross your fingers...."
+            >&2 echo "There is no tag/branch for ${commitish} in the IHaskell repo"
+            >&2 echo "We will try to use the default 'stack.yaml'.  Cross your fingers...."
             sleep 3s
         fi
     )
@@ -189,7 +185,7 @@ ihaskell_install_dir="$(cd ${ihaskell_dir}; stack path --resolver=${snapshot} --
 ihaskell=${ihaskell_install_dir}/ihaskell
 if [ ! -f "${ihaskell}" ]; then
 (
-  report "Building IHaskell..."
+  >&2 echo "Building IHaskell..."
   mkdir -p ${ihaskell_install_dir}
   cd ${ihaskell_dir}
   ${stack} build --resolver=${snapshot} --fast  ## todo: consider not fast
@@ -210,17 +206,19 @@ if [ ! -z "${STACK_NOTEBOOK_KERNEL_DEBUG}" ]; then
 fi
 
 kernel_dir=${kernels_dir}/${kernel}
+ghc_bin_dir=$(${stack} path --compiler-bin)
 
 if [ ! -d "${kernel_dir}" ]; then
-    ghc_dir=$(dirname $(${stack} path --compiler-bin))
+    ghc_dir=$(dirname ${ghc_bin_dir})
     ghc=$(basename ${ghc_dir})
     ghc_lib=${ghc_dir}/lib/${ghc}
     (
-      echo "Creating jupyter kernel for ${kernel}..."
+      >&2 echo "Creating jupyter kernel for ${kernel}..."
 
       #prepare pkg_db_path
+      # TODO: Consider not using a fixed env, but relying on the kernel being launched
+      # TODO: with proper env variables set.  Requires conda kernel isolation to work
       #helper
-
       strindex() {
         x="${1%%$2*}"
         [[ "$x" = "$1" ]] && echo -1 || echo "${#x}"
@@ -287,9 +285,8 @@ You will need to set that env variable each time you run stack notebook for this
 project.  However, should you forget, stack notebook will detect the mistake and ask
 you to help it resolve the situation by showing you this message again.
 
-Note:  You can also remove the existing kernel if you like.  Kernels can be managed
-using commands such as:
-> (cd; echo "jupyter kernelspec list" | stack notebook)
+Note:  You can also remove the existing kernel if you like. It is located at
+${kernel_dir}.
 
 Ok, I hope that helps.  I'm going to exit now. Sorry again, and good luck!
 
@@ -298,16 +295,12 @@ exit 1
 
 fi
 
-## Runtime
-
-if [ -t 0 ]; then # stdin is a pipe
-    cmd="${jupyter} notebook"
-else
-   cmd=$(</dev/stdin)
-fi
-stack exec bash << EOM
-export PATH=${conda_dir}/bin:${ihaskell_install_dir}:\${PATH}
+export PATH=${conda_dir}/bin:${ihaskell_install_dir}:${ghc_bin_dir}:${PATH}
 export STACK_NOTEBOOK_KERNEL=${kernel}
 
-${cmd}
-EOM
+## Runtime
+if [[ $# -eq 0 ]]; then
+   set -- jupyter notebook
+   echo "$@"
+fi
+exec "$@"

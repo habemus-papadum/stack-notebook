@@ -75,7 +75,7 @@ Truth be told, this script may not be for you. This is more of an exploration of
 * Do scan through the script if you want to know more details.   
 
 ## Advanced usage
-`stack notebook` just executes whatever is piped into `STDIN`.  A plain `stack notebook` invocation is equivalent to `echo "jupyter notebook" | stack notebook`.  This can be used to render notebooks, list and delete kernels, allow connections from remote boxes, and so forth.  See the `.travis.yml` for ideas.    
+The last line of `stack notebook` is just `exec "$@"`.  A plain `stack notebook` invocation is equivalent to `stack notebook jupyter notebook`.  This can be used to render notebooks, list and delete kernels, allow connections from remote boxes, and so forth.  See the `.travis.yml` for ideas.    
 
 #### Use by date
 As I write this, it is Oct. 15, 2017 -- If you are still relying on the repo 3-4 months from now, you are asking for trouble...
