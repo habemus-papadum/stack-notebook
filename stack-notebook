@@ -146,10 +146,10 @@ Zeromq4 is widely available, and installation can often be as easy as:
 ## macOS
 brew install zeromq
 
-## On many systems, this will work:
-git clone http://www.github.com/zeromq/zeromq4-x.git
-cd zeromq4-x
-./autogen.sh && ./configure && make -j4 && make check && sudo make install && sudo ldconfig
+## Please vist: http://zeromq.org/area:download for more info
+
+Note: Once you have installed zeromq, if 'pkg-config --mod-version libzmq' looks ok,
+then you should be good to go.
 
 Once zeromq has been installed, just rerun 'stack notebook' and it will continue where it
 left off.
@@ -161,7 +161,10 @@ and involves making risk trade-offs that I feel uncomfortable making for you.
 Note:
 On Linux, if you are using a package manager to get zeromq, make sure it provides you with zeromq 4.x
 (as opposed to 2.x or 3.x), and that you get the dev package as well as the runtime package.
-If you must stay at a lower version, I'm afraid there may not be a simple solution....
+
+Note: Centos/Scientific/RHEL probably need to grab zeromq from epel
+
+Note: If you must stay at a lower version, I'm afraid there may not be a simple solution....
 
 Ok, I hope that helps.  I'm going to exit now. Sorry again, and good luck!
 
