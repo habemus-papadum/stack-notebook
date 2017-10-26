@@ -69,11 +69,21 @@ project=$(basename ${project_root})
 snapshot=$(basename "$(dirname "$(stack path --snapshot-install-root)")")
 >&2 echo "Using stack snapshot ${snapshot}..."
 
+# kernel name
+kernel="${project}-${snapshot}${IHASKELL_DEV_MODE}"
+if [ ! -z "${STACK_NOTEBOOK_KERNEL_NAME}" ]; then
+  kernel=${STACK_NOTEBOOK_KERNEL_NAME}
+fi
+if [ ! -z "${STACK_NOTEBOOK_KERNEL_DEBUG}" ]; then
+  kernel="${kernel}-debug"
+fi
+
+
 notebook_dir=${HOME}/.stack-notebook
 mkdir -p ${notebook_dir}
 ##conda
 conda_dir=${notebook_dir}/conda
-conda=${conda_dir}/bin/conda
+root_conda=${conda_dir}/bin/conda
 if [ ! -d "${conda_dir}" ]; then
 (
   cd ${notebook_dir}
@@ -94,11 +104,16 @@ fi
 jupyter=${notebook_dir}/conda/bin/jupyter
 if [ ! -f "${jupyter}" ]; then
 (
-  ${conda} install --yes jupyter_core=4.3 notebook=5.0 nbconvert=5.2 ipykernel=4.6 ipywidgets=6.0 widgetsnbextension=2.0
+  ${root_conda} install --yes jupyter_core=4.3 notebook=5.0 nbconvert=5.2 ipykernel=4.6 ipywidgets=6.0 widgetsnbextension=2.0
 )
 fi
 
-
+## conda env
+conda_env_dir=${conda_dir}/envs/${kernel}
+if [ ! -d "${conda_env_dir}" ]; then
+    echo "Creating a conda env for ${kernel}..."
+    ${root_conda} create --no-default-packages --name ${kernel} --clone root
+fi
 
 ## IHaskell
 nb_snapshot_dir=${notebook_dir}/snapshots/${snapshot}
@@ -114,7 +129,7 @@ if [ ! -z "${IHASKELL_DEV_MODE}" ]; then
 elif [ ! -d "${ihaskell_dir}" ]; then
 
     ## check if zeromq exists
-    >&2 echo "Ensuring zeromq 4.0 has been installed..."
+    >&2 echo "Ensuring zeromq 4.x has been installed..."
     set +e
     pkg-config --atleast-version=4.0.0 libzmq && pkg-config --max-version=5.0.0 libzmq
     zmq_ok=$?
@@ -193,18 +208,7 @@ if [ ! -f "${ihaskell}" ]; then
 fi
 
 # kernel spec
-kernels_dir=${conda_dir}/share/jupyter/kernels
-kernel="${project}-${snapshot}${IHASKELL_DEV_MODE}"
-if [ ! -z "${STACK_NOTEBOOK_KERNEL_NAME}" ]; then
-  kernel=${STACK_NOTEBOOK_KERNEL_NAME}
-fi
-
-
-if [ ! -z "${STACK_NOTEBOOK_KERNEL_DEBUG}" ]; then
-  kernel="${kernel}-debug"
-  debug_flag="\"--debug\","
-fi
-
+kernels_dir=${conda_env_dir}/share/jupyter/kernels
 kernel_dir=${kernels_dir}/${kernel}
 ghc_bin_dir=$(${stack} path --compiler-bin)
 
@@ -214,6 +218,10 @@ if [ ! -d "${kernel_dir}" ]; then
     ghc_lib=${ghc_dir}/lib/${ghc}
     (
       >&2 echo "Creating jupyter kernel for ${kernel}..."
+
+      if [ ! -z "${STACK_NOTEBOOK_KERNEL_DEBUG}" ]; then
+        debug_flag="\"--debug\","
+      fi
 
       #prepare pkg_db_path
       # TODO: Consider not using a fixed env, but relying on the kernel being launched
@@ -237,8 +245,10 @@ if [ ! -d "${kernel_dir}" ]; then
       interposed_pkg_db_path=$(interpose ${project_pkg_db_path} ${ihaskell_pkg_db})
       interposed_pkg_sandboxes=$(interpose ${sandboxes} ${ihaskell_pkg_db})
 
-      mkdir -p ${kernel_dir}
-      cat << EOM > ${kernel_dir}/kernel.json
+      #https://unix.stackexchange.com/questions/30091/fix-or-alternative-for-mktemp-in-os-x
+      tmpdir=`mktemp -d 2>/dev/null || mktemp -d -t 'stack-notebooktmpdir'`
+
+      cat << EOM > ${tmpdir}/kernel.json
           {
               "display_name": "${kernel}",
               "argv": [
@@ -262,9 +272,14 @@ if [ ! -d "${kernel_dir}" ]; then
 EOM
 
       ##copy files
-      cp ${ihaskell_dir}/html/* ${kernel_dir}
+      cp ${ihaskell_dir}/html/* ${tmpdir}
       ## collision helper
-      echo "${project_root}" > ${kernel_dir}/collision_helper
+      echo "${project_root}" > ${tmpdir}/collision_helper
+
+      ## kernelspec install
+      ${conda_env_dir}/bin/jupyter kernelspec install ${tmpdir} --sys-prefix --name=${kernel}
+      ## List kernelspecs -- work around a jupyter bug?  If this is not done the kernel spec is not visible in the conda env
+      ${conda_env_dir}/bin/jupyter kernelspec list
     )
 fi
 kernel_project_root=$(cat ${kernel_dir}/collision_helper)
@@ -297,10 +312,9 @@ fi
 
 export PATH=${conda_dir}/bin:${ihaskell_install_dir}:${ghc_bin_dir}:${PATH}
 export STACK_NOTEBOOK_KERNEL=${kernel}
-
+source ${conda_dir}/bin/activate ${kernel}
 ## Runtime
 if [[ $# -eq 0 ]]; then
    set -- jupyter notebook
-   echo "$@"
 fi
 exec "$@"
