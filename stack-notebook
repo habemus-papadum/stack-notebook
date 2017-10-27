@@ -192,8 +192,10 @@ EOM
             rm stack.yaml
             ln -s stack-${snapshot}.yaml stack.yaml
         else
-            >&2 echo "There is no tag/branch for ${commitish} in the IHaskell repo"
-            >&2 echo "We will try to use the default 'stack.yaml'.  Cross your fingers...."
+            >&2 echo "There is no yaml/tag/branch for ${commitish} in the IHaskell repo"
+            >&2 echo "We will try to use 'stack-safe.yaml' in which ALL fancy displays are disabled.  Cross your fingers...."
+            rm stack.yaml
+            ln -s stack-safe.yaml stack.yaml
             sleep 3s
         fi
     )
@@ -203,7 +205,7 @@ ihaskell_install_dir="$(cd ${ihaskell_dir}; stack path --resolver=${snapshot} --
 ihaskell=${ihaskell_install_dir}/ihaskell
 if [ ! -f "${ihaskell}" ]; then
 (
-  >&2 echo "Building IHaskell..."
+  >&2 echo "Building IHaskell for ${snapshot}..."
   mkdir -p ${ihaskell_install_dir}
   cd ${ihaskell_dir}
   ${stack} build --resolver=${snapshot} --fast  ## todo: consider not fast
@@ -244,7 +246,7 @@ if [ ! -d "${kernel_dir}" ]; then
 
       project_pkg_db_path=$(${stack} exec bash -- -c "echo \$GHC_PACKAGE_PATH")
       sandboxes=$(${stack} exec bash -- -c "echo \$HASKELL_PACKAGE_SANDBOXES")
-      ihaskell_pkg_db=$(cd ${ihaskell_dir}; ${stack} path --local-pkg-db)
+      ihaskell_pkg_db=$(cd ${ihaskell_dir}; ${stack} path --local-pkg-db --resolver=${snapshot})
       interposed_pkg_db_path=$(interpose ${project_pkg_db_path} ${ihaskell_pkg_db})
       interposed_pkg_sandboxes=$(interpose ${sandboxes} ${ihaskell_pkg_db})
 
