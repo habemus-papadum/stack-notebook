@@ -12,7 +12,7 @@ do_test_1() {
 
     stack notebook echo Check installation successful
     kernel=$(stack notebook bash -c "echo \$STACK_NOTEBOOK_KERNEL") && echo ${kernel}
-    stack notebook jupyter nbconvert --ExecutePreprocessor.kernel_name=${kernel} --to notebook --execute --stdout ${STACK_NB_DIR}/test/DisplayTest.ipynb > test.ipynb
+    stack notebook jupyter nbconvert --debug --ExecutePreprocessor.kernel_name=${kernel} --to notebook --execute --stdout ${STACK_NB_DIR}/test/DisplayTest.ipynb > test.ipynb
     diff test.ipynb ${STACK_NB_DIR}/test/DisplayTest.ipynb
 
 }
