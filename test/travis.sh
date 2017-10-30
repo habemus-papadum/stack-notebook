@@ -21,8 +21,9 @@ do_test_suite() {
     do_test_1
 
 }
+
 # test within global project
-do_test_suite
+# do_test_suite
 
 # test within a specific project
 stack new test-proj $RESOLVER
